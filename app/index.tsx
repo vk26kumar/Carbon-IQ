@@ -4,12 +4,13 @@ import {
   FlatList,
   I18nManager,
   Image,
-  SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import i18n from "../utils/i18n";
 
 const languages = [
@@ -41,7 +42,10 @@ export default function LandingScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.innerContainer}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={styles.content}>
           <Image
             source={require("../assets/images/walmart-logo.png")}
@@ -50,9 +54,7 @@ export default function LandingScreen() {
           />
 
           <Text style={styles.title}>{i18n.t("carbon_toolkit_title")}</Text>
-          <Text style={styles.subtitle}>
-            {i18n.t("carbon_toolkit_subtitle")}
-          </Text>
+          <Text style={styles.subtitle}>{i18n.t("carbon_toolkit_subtitle")}</Text>
 
           <Text style={styles.languagePrompt}>{i18n.t("select_language")}</Text>
 
@@ -92,7 +94,7 @@ export default function LandingScreen() {
         <TouchableOpacity style={styles.button} onPress={handleGetStarted}>
           <Text style={styles.buttonText}>{i18n.t("next")}</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -102,8 +104,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
   },
-  innerContainer: {
-    flex: 1,
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingTop: 40,
@@ -176,6 +178,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 50,
     borderRadius: 8,
     alignSelf: "center",
+    marginTop: 20,
   },
   buttonText: {
     color: "#FFFFFF",

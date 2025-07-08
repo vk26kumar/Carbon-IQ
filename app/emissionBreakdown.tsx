@@ -63,7 +63,11 @@ const EmissionBreakdownScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+      keyboardShouldPersistTaps="handled"
+    >
       <View style={styles.topRow}>
         <TouchableOpacity onPress={() => router.push("/home")}>
           <Ionicons name="home-outline" size={26} color="#0071CE" />
@@ -101,9 +105,7 @@ const EmissionBreakdownScreen = () => {
 
       <View style={styles.section}>
         <Ionicons name="bulb-outline" size={26} style={styles.icon} />
-        <Text style={styles.subHeading}>
-          {i18n.t("emission_reduction_tips")}
-        </Text>
+        <Text style={styles.subHeading}>{i18n.t("emission_reduction_tips")}</Text>
 
         {parsedTips.length === 0 ? (
           <Text style={styles.emptyText}>{i18n.t("no_tips_available")}</Text>
@@ -146,14 +148,16 @@ const EmissionBreakdownScreen = () => {
 
 export default EmissionBreakdownScreen;
 
-// (styles are same as your current code)
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FAFCFE",
+  },
+  scrollContent: {
     padding: 24,
     paddingTop: 60,
+    paddingBottom: 40,
   },
   topRow: {
     flexDirection: "row",
@@ -219,7 +223,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 10,
-    marginBottom: 40,
     gap: 12,
   },
   csvButton: {
