@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import "dotenv/config";
 
 export default {
   expo: {
@@ -7,27 +7,27 @@ export default {
     version: "1.0.0",
     orientation: "portrait",
     scheme: "wallmart",
-    icon: "../assets/icon.png",
+    icon: "./assets/icon.png", // ✅ Fixed relative path
     splash: {
-      image: "../assets/splash.png",
+      image: "./assets/splash.png", // ✅ Fixed relative path
       resizeMode: "contain",
-      backgroundColor: "#ffffff"
+      backgroundColor: "#ffffff",
     },
     updates: {
-      fallbackToCacheTimeout: 0
+      fallbackToCacheTimeout: 0,
     },
     assetBundlePatterns: ["**/*"],
     ios: {
-      supportsTablet: true
+      supportsTablet: true,
     },
     android: {
       adaptiveIcon: {
         foregroundImage: "./assets/adaptive-icon.png",
-        backgroundColor: "#ffffff"
-      }
+        backgroundColor: "#ffffff",
+      },
     },
     web: {
-      favicon: "./assets/favicon.png"
+      favicon: "./assets/favicon.png",
     },
     extra: {
       FIREBASE_API_KEY: process.env.FIREBASE_API_KEY,
@@ -37,6 +37,6 @@ export default {
       FIREBASE_MESSAGING_SENDER_ID: process.env.FIREBASE_MESSAGING_SENDER_ID,
       FIREBASE_APP_ID: process.env.FIREBASE_APP_ID,
       FIREBASE_MEASUREMENT_ID: process.env.FIREBASE_MEASUREMENT_ID,
-    }
-  }
+    },
+  },
 };
