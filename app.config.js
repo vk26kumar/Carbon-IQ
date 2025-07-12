@@ -1,16 +1,16 @@
 const dotenv = require('dotenv');
 dotenv.config();
 
-export default {
+module.exports = {
   expo: {
     name: "Wallmart",
     slug: "wallmart",
     version: "1.0.0",
     orientation: "portrait",
     scheme: "wallmart",
-    icon: "./assets/icon.png", // ✅ Fixed relative path
+    icon: "./assets/icon.png",
     splash: {
-      image: "./assets/splash.png", // ✅ Fixed relative path
+      image: "./assets/splash.png",
       resizeMode: "contain",
       backgroundColor: "#ffffff",
     },
