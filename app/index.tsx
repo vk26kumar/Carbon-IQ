@@ -48,7 +48,7 @@ export default function LandingScreen() {
       >
         <View style={styles.content}>
           <Image
-            source={require("../assets/images/walmart-logo.png")}
+            source={require("../assets/images/logo.png")}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -115,9 +115,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logo: {
-    width: 160,
-    height: 100,
-    marginBottom: 24,
+    width: 200,
+    height: 150,
+    marginBottom: 8,
   },
   title: {
     fontSize: 24,
