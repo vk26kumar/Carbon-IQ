@@ -1,7 +1,6 @@
-const dotenv = require('dotenv');
-dotenv.config();
+import 'dotenv/config';
 
-module.exports = {
+export default {
   expo: {
     name: "Wallmart",
     slug: "wallmart",
