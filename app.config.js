@@ -2,11 +2,11 @@ import 'dotenv/config';
 
 export default {
   expo: {
-    name: "Wallmart",
-    slug: "wallmart",
+    name: "CARBON-IQ",
+    slug: "CARBON-IQ",
     version: "1.0.0",
     orientation: "portrait",
-    scheme: "wallmart",
+    scheme: "CARBON-IQ",
     icon: "./assets/icon.png",
     splash: {
       image: "./assets/splash.png",

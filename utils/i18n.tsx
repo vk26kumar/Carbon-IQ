@@ -19,9 +19,9 @@ i18n.translations = {
     carbon_toolkit_title: "Carbon Reporting Toolkit",
     carbon_toolkit_subtitle:
       "Helping vendors like you track, compare and report emissions with ease.",
-    vendor_id_placeholder: "WAL12345",
-    name_placeholder: "John Doe",
-    mobile_placeholder: "9876543210",
+    vendor_id_placeholder: "Your Vendor ID (e.g., WAL12345)",
+    name_placeholder: "Write your Name",
+    mobile_placeholder: "Your Mobile Number",
 
     fabric_produced: "Fabric Produced (m)",
     electricity_used: "Electricity Used (kWh)",
@@ -147,9 +147,9 @@ i18n.translations = {
     carbon_toolkit_title: "कार्बन रिपोर्टिंग टूलकिट",
     carbon_toolkit_subtitle:
       "आप जैसे विक्रेताओं को उत्सर्जन को ट्रैक, तुलना और रिपोर्ट करने में मदद करता है।",
-    vendor_id_placeholder: "WAL12345",
-    name_placeholder: "राम कुमार",
-    mobile_placeholder: "९८७६५४३२१०",
+    vendor_id_placeholder: "आपका विक्रेता आईडी (जैसे, WAL12345)",
+    name_placeholder: "अपना नाम लिखें",
+    mobile_placeholder: "आपका मोबाइल नंबर",
 
     fabric_produced: "उत्पादित कपड़ा (मीटर)",
     electricity_used: "बिजली की खपत (किलोवाट)",
@@ -271,9 +271,9 @@ i18n.translations = {
     carbon_toolkit_title: "Kit de Herramientas de Reporte de Carbono",
     carbon_toolkit_subtitle:
       "Ayudando a proveedores como usted a rastrear, comparar y reportar emisiones fácilmente.",
-    vendor_id_placeholder: "WAL12345",
-    name_placeholder: "Juan Pérez",
-    mobile_placeholder: "9876543210",
+    vendor_id_placeholder: "Su ID de proveedor (ej. WAL12345)",
+    name_placeholder: "Escriba su nombre",
+    mobile_placeholder: "Su número de móvil",
 
     fabric_produced: "Tela producida (m)",
     electricity_used: "Electricidad utilizada (kWh)",
@@ -390,9 +390,9 @@ i18n.translations = {
     carbon_toolkit_title: "Outil de Rapport Carbone",
     carbon_toolkit_subtitle:
       "Aider les fournisseurs comme vous à suivre, comparer et déclarer les émissions facilement.",
-    vendor_id_placeholder: "WAL12345",
-    name_placeholder: "Jean Dupont",
-    mobile_placeholder: "9876543210",
+    vendor_id_placeholder: "Votre ID fournisseur (ex. WAL12345)",
+    name_placeholder: "Écrivez votre nom",
+    mobile_placeholder: "Votre numéro de mobile",
 
     fabric_produced: "Tissu produit (m)",
     electricity_used: "Électricité utilisée (kWh)",
@@ -511,9 +511,9 @@ i18n.translations = {
     carbon_toolkit_title: "碳排放报告工具包",
     carbon_toolkit_subtitle:
       "帮助像您这样的供应商轻松跟踪、比较并报告排放情况。",
-    vendor_id_placeholder: "WAL12345",
-    name_placeholder: "张伟",
-    mobile_placeholder: "9876543210",
+    vendor_id_placeholder: "您的供应商 ID (例如 WAL12345)",
+    name_placeholder: "输入您的姓名",
+    mobile_placeholder: "输入您的手机号码",
 
     fabric_produced: "生产的布料 (米)",
     electricity_used: "用电量 (千瓦时)",
@@ -628,9 +628,9 @@ i18n.translations = {
     carbon_toolkit_title: "أداة تقارير الكربون",
     carbon_toolkit_subtitle:
       "مساعدة الموردين مثلك على تتبع الانبعاثات ومقارنتها والإبلاغ عنها بسهولة.",
-    vendor_id_placeholder: "وال12345",
-    name_placeholder: "محمد أحمد",
-    mobile_placeholder: "٩٨٧٦٥٤٣٢١٠",
+    vendor_id_placeholder: "معرّف المورد (مثل WAL12345)",
+    name_placeholder: "اكتب اسمك",
+    mobile_placeholder: "رقم الجوال الخاص بك",
 
     fabric_produced: "القماش المنتج (متر)",
     electricity_used: "الكهرباء المستخدمة (كيلوواط ساعة)",
