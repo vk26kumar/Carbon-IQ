@@ -6,7 +6,8 @@ import { addDoc, collection } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
   Image,
-  SafeAreaView,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,6 +15,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Industry images
 const industryImages: { [key: string]: any } = {
@@ -131,137 +133,143 @@ const FormScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.heading}>
-          {i18n.t("industry")}: {i18n.t(industry?.toString() || "")}
-        </Text>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <Text style={styles.heading}>
+            {i18n.t("industry")}: {i18n.t(industry?.toString() || "")}
+          </Text>
 
-        {industry && industryImages[industry as string] && (
-          <Image
-            source={industryImages[industry as string]}
-            style={styles.industryImage}
-            resizeMode="contain"
-          />
-        )}
+          {industry && industryImages[industry as string] && (
+            <Image
+              source={industryImages[industry as string]}
+              style={styles.industryImage}
+              resizeMode="contain"
+            />
+          )}
 
-        {industry === "textile" && (
-          <>
-            {renderTextInput(
-              "fabric_produced",
-              i18n.t("fabric_produced"),
-              "cut-outline"
-            )}
-            {renderTextInput(
-              "electricity_used",
-              i18n.t("electricity_used"),
-              "flash-outline"
-            )}
-            {renderTextInput(
-              "water_used",
-              i18n.t("water_used"),
-              "water-outline"
-            )}
-            {renderTextInput(
-              "chemicals_used",
-              i18n.t("chemicals_used"),
-              "flask-outline"
-            )}
-            {renderTextInput(
-              "diesel_used",
-              i18n.t("diesel_used"),
-              "speedometer-outline"
-            )}
-          </>
-        )}
+          {industry === "textile" && (
+            <>
+              {renderTextInput(
+                "fabric_produced",
+                i18n.t("fabric_produced"),
+                "cut-outline"
+              )}
+              {renderTextInput(
+                "electricity_used",
+                i18n.t("electricity_used"),
+                "flash-outline"
+              )}
+              {renderTextInput(
+                "water_used",
+                i18n.t("water_used"),
+                "water-outline"
+              )}
+              {renderTextInput(
+                "chemicals_used",
+                i18n.t("chemicals_used"),
+                "flask-outline"
+              )}
+              {renderTextInput(
+                "diesel_used",
+                i18n.t("diesel_used"),
+                "speedometer-outline"
+              )}
+            </>
+          )}
 
-        {industry === "dairy" && (
-          <>
-            {renderTextInput(
-              "milk_produced",
-              i18n.t("milk_produced"),
-              "wine-outline"
-            )}
-            {renderTextInput("cows", i18n.t("cows"), "paw-outline")}
-            {renderTextInput(
-              "electricity_used",
-              i18n.t("electricity_used"),
-              "flash-outline"
-            )}
-            {renderTextInput(
-              "fodder_used",
-              i18n.t("fodder_used"),
-              "leaf-outline"
-            )}
-            {renderTextInput(
-              "diesel_used",
-              i18n.t("diesel_used"),
-              "speedometer-outline"
-            )}
-          </>
-        )}
+          {industry === "dairy" && (
+            <>
+              {renderTextInput(
+                "milk_produced",
+                i18n.t("milk_produced"),
+                "wine-outline"
+              )}
+              {renderTextInput("cows", i18n.t("cows"), "paw-outline")}
+              {renderTextInput(
+                "electricity_used",
+                i18n.t("electricity_used"),
+                "flash-outline"
+              )}
+              {renderTextInput(
+                "fodder_used",
+                i18n.t("fodder_used"),
+                "leaf-outline"
+              )}
+              {renderTextInput(
+                "diesel_used",
+                i18n.t("diesel_used"),
+                "speedometer-outline"
+              )}
+            </>
+          )}
 
-        {industry === "agriculture" && (
-          <>
-            {renderTextInput("land_area", i18n.t("land_area"), "map-outline")}
-            {renderTextInput(
-              "fertilizer_used",
-              i18n.t("fertilizer_used"),
-              "flask-outline"
-            )}
-            {renderTextInput(
-              "electricity_used",
-              i18n.t("electricity_used"),
-              "flash-outline"
-            )}
-            {renderTextInput(
-              "diesel_used",
-              i18n.t("diesel_used"),
-              "speedometer-outline"
-            )}
-            {renderTextInput(
-              "crop_yield",
-              i18n.t("crop_yield"),
-              "bar-chart-outline"
-            )}
-          </>
-        )}
+          {industry === "agriculture" && (
+            <>
+              {renderTextInput("land_area", i18n.t("land_area"), "map-outline")}
+              {renderTextInput(
+                "fertilizer_used",
+                i18n.t("fertilizer_used"),
+                "flask-outline"
+              )}
+              {renderTextInput(
+                "electricity_used",
+                i18n.t("electricity_used"),
+                "flash-outline"
+              )}
+              {renderTextInput(
+                "diesel_used",
+                i18n.t("diesel_used"),
+                "speedometer-outline"
+              )}
+              {renderTextInput(
+                "crop_yield",
+                i18n.t("crop_yield"),
+                "bar-chart-outline"
+              )}
+            </>
+          )}
 
-        {industry === "manufacturing" && (
-          <>
-            {renderTextInput(
-              "units_produced",
-              i18n.t("units_produced"),
-              "cube-outline"
-            )}
-            {renderTextInput(
-              "electricity_used",
-              i18n.t("electricity_used"),
-              "flash-outline"
-            )}
-            {renderTextInput(
-              "water_used",
-              i18n.t("water_used"),
-              "water-outline"
-            )}
-            {renderTextInput(
-              "chemicals_used",
-              i18n.t("chemicals_used"),
-              "flask-outline"
-            )}
-            {renderTextInput(
-              "diesel_used",
-              i18n.t("diesel_used"),
-              "speedometer-outline"
-            )}
-          </>
-        )}
+          {industry === "manufacturing" && (
+            <>
+              {renderTextInput(
+                "units_produced",
+                i18n.t("units_produced"),
+                "cube-outline"
+              )}
+              {renderTextInput(
+                "electricity_used",
+                i18n.t("electricity_used"),
+                "flash-outline"
+              )}
+              {renderTextInput(
+                "water_used",
+                i18n.t("water_used"),
+                "water-outline"
+              )}
+              {renderTextInput(
+                "chemicals_used",
+                i18n.t("chemicals_used"),
+                "flask-outline"
+              )}
+              {renderTextInput(
+                "diesel_used",
+                i18n.t("diesel_used"),
+                "speedometer-outline"
+              )}
+            </>
+          )}
 
-        <View style={styles.submitWrapper}>
-          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-            <Text style={styles.submitText}>{i18n.t("submit")}</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+          <View style={styles.submitWrapper}>
+            <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+              <Text style={styles.submitText}>{i18n.t("submit")}</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

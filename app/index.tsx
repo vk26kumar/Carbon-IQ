@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   },
   languageCard: {
     backgroundColor: "#f2f2f2",
-    paddingVertical: 14,
+    paddingVertical: 10,
     paddingHorizontal: 28,
     borderRadius: 10,
     margin: 10,
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#0071CE",
-    paddingVertical: 14,
+    paddingVertical: 10,
     paddingHorizontal: 50,
     borderRadius: 8,
     alignSelf: "center",

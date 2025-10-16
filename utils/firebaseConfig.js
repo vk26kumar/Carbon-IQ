@@ -2,7 +2,7 @@ import Constants from "expo-constants";
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
-// Use Constants to get values at runtime in Expo
+// ✅ Read from EXPO_PUBLIC_ environment variables for EAS builds
 const firebaseConfig = {
   apiKey: Constants.expoConfig?.extra?.FIREBASE_API_KEY ?? "",
   authDomain: Constants.expoConfig?.extra?.FIREBASE_AUTH_DOMAIN ?? "",
@@ -14,8 +14,9 @@ const firebaseConfig = {
   measurementId: Constants.expoConfig?.extra?.FIREBASE_MEASUREMENT_ID ?? "",
 };
 
-// ✅ Avoid initializing twice (important in Expo with hot reload)
+// ✅ Initialize only once (safe for Expo hot reload)
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-// ✅ Export Firestore instance
+// ✅ Export initialized Firebase app and Firestore
+export const firebaseApp = app;
 export const db = getFirestore(app);

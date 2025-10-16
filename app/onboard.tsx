@@ -6,7 +6,6 @@ import { addDoc, collection } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,6 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Onboard = () => {
   const { lang } = useLocalSearchParams();
