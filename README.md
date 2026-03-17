@@ -1,50 +1,67 @@
-# Welcome to your Expo app 👋
+# 🌱 Carbon IQ  
+AI-Powered Carbon Emission Reporting Toolkit  
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Carbon IQ is a multilingual mobile application that enables vendors to track, analyze, and optimize their carbon emissions through real-time calculations and intelligent insights.
 
-## Get started
+---
 
-1. Install dependencies
+## 🚀 Features
 
-   ```bash
-   npm install
-   ```
+- 🌍 Multilingual support (English, Hindi, Español, Français, 中文, العربية)  
+- 🏭 Industry-based data input (Textile, Dairy, Agriculture, Manufacturing, etc.)  
+- 📊 Real-time carbon emission calculation  
+- ⚖️ Normalized scoring aligned with government standards  
+- 🚨 Detection of overused resources (electricity, water, chemicals, fuel)  
+- 💡 Actionable sustainability recommendations  
+- 📈 Detailed analytics dashboard with visual insights  
+- 📥 Export reports in CSV format  
+- 📱 Clean, responsive, and user-friendly mobile UI  
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
+## 🧠 How It Works
 
-In the output, you'll find options to open the app in a
+1. Register as a vendor  
+2. Select your industry  
+3. Input resource usage data  
+4. System calculates:
+   - Total emission score  
+   - Normalized emission score  
+   - Rating and compliance status  
+5. Get:
+   - Overuse alerts  
+   - Personalized sustainability tips  
+6. View analytics and download reports  
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 🛠️ Tech Stack
 
-## Get a fresh project
+- Frontend: React Native, Expo  
+- Language: JavaScript  
+- Routing: Expo Router  
+- Localization: i18n  
+- Data Handling: JSON-based processing  
+- Visualization: Charts & Graphs  
+- File Export: CSV generation  
 
-When you're ready, run:
+---
+
+## 📱 Screenshots
+
+- Language selection and onboarding  
+- Vendor registration  
+- Industry-specific data input  
+- Emission results and scoring  
+- Overuse detection and tips  
+- Detailed analytics dashboard  
+
+---
+
+## 📦 Installation
 
 ```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+git clone https://github.com/vk26kumar/Carbon-IQ.git
+cd Carbon-IQ
+npm install
+npx expo start
