@@ -1,22 +1,104 @@
 import { db } from "@/utils/firebaseConfig";
 import i18n from "@/utils/i18n";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { addDoc, collection } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  Animated,
+  Easing,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
+// ─── Animated metric card ─────────────────────────────────────────────────────
+function MetricCard({
+  icon,
+  title,
+  value,
+  sub,
+  delay,
+  accent,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  title: string;
+  value: string;
+  sub?: string;
+  delay: number;
+  accent: string;
+}) {
+  const fade = useRef(new Animated.Value(0)).current;
+  const slide = useRef(new Animated.Value(20)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fade, {
+        toValue: 1,
+        duration: 400,
+        delay,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slide, {
+        toValue: 0,
+        duration: 400,
+        delay,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
+  return (
+    <Animated.View
+      style={[
+        styles.metricCard,
+        { opacity: fade, transform: [{ translateY: slide }] },
+      ]}
+    >
+      <View
+        style={[
+          styles.metricIconCircle,
+          { backgroundColor: accent + "18", borderColor: accent + "30" },
+        ]}
+      >
+        <Ionicons name={icon} size={22} color={accent} />
+      </View>
+      <Text style={styles.metricTitle}>{title}</Text>
+      <Text style={[styles.metricValue, { color: accent }]}>{value}</Text>
+      {sub && <Text style={styles.metricSub}>{sub}</Text>}
+    </Animated.View>
+  );
+}
+
+// ─── Star row ─────────────────────────────────────────────────────────────────
+function Stars({ count }: { count: number }) {
+  return (
+    <View style={styles.starRow}>
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Ionicons
+          key={i}
+          name={i < count ? "star" : "star-outline"}
+          size={24}
+          color={i < count ? "#f0b429" : "#cde8a8"}
+          style={{ marginHorizontal: 2 }}
+        />
+      ))}
+    </View>
+  );
+}
+
+// ─── Main screen ──────────────────────────────────────────────────────────────
 const ResultScreen = () => {
   const router = useRouter();
   const {
     lang,
     vendorId,
+    name,
     industry,
     fabric_produced,
     electricity_used,
@@ -39,6 +121,18 @@ const ResultScreen = () => {
   const [standardNormalized, setStandardNormalized] = useState(0);
   const [tips, setTips] = useState<string[]>([]);
   const [overusedItems, setOverusedItems] = useState<string[]>([]);
+  const [starsCount, setStarsCount] = useState(0);
+  const [ready, setReady] = useState(false);
+
+  // Header entrance
+  const headerFade = useRef(new Animated.Value(0)).current;
+  const headerSlide = useRef(new Animated.Value(-20)).current;
+
+  // Score count-up animation
+  const scoreAnim = useRef(new Animated.Value(0)).current;
+
+  // Always-glow next button
+  const glowAnim = useRef(new Animated.Value(0)).current;
 
   const formData =
     industry === "textile"
@@ -50,34 +144,33 @@ const ResultScreen = () => {
           diesel_used,
         }
       : industry === "dairy"
-      ? { milk_produced, cows, electricity_used, fodder_used, diesel_used }
-      : industry === "agriculture"
-      ? {
-          land_area,
-          fertilizer_used,
-          electricity_used,
-          diesel_used,
-          crop_yield,
-        }
-      : {
-          units_produced,
-          electricity_used,
-          water_used,
-          chemicals_used,
-          diesel_used,
-        };
+        ? { milk_produced, cows, electricity_used, fodder_used, diesel_used }
+        : industry === "agriculture"
+          ? {
+              land_area,
+              fertilizer_used,
+              electricity_used,
+              diesel_used,
+              crop_yield,
+            }
+          : {
+              units_produced,
+              electricity_used,
+              water_used,
+              chemicals_used,
+              diesel_used,
+            };
 
   useEffect(() => {
     if (lang) i18n.locale = lang.toString();
   }, [lang]);
 
   useEffect(() => {
-    const calculateResult = async () => {
+    const calculate = async () => {
       let total = 0;
       let normalizedVal = 0;
       const exceeded: string[] = [];
-
-      const toNum = (val: any) => Number(val) || 0;
+      const toNum = (v: any) => Number(v) || 0;
 
       if (industry === "textile") {
         const fabric = toNum(fabric_produced);
@@ -85,163 +178,126 @@ const ResultScreen = () => {
         const water = toNum(water_used);
         const chem = toNum(chemicals_used);
         const diesel = toNum(diesel_used);
-
-        const stdElec = Number((fabric * 0.3).toFixed(2));
-        const stdWater = Number((fabric * 50).toFixed(2));
-        const stdChem = Number((fabric * 0.1).toFixed(2));
-        const stdDiesel = Number((fabric * 0.08).toFixed(2));
-
+        const stdElec = +(fabric * 0.3).toFixed(2);
+        const stdWater = +(fabric * 50).toFixed(2);
+        const stdChem = +(fabric * 0.1).toFixed(2);
+        const stdDiesel = +(fabric * 0.08).toFixed(2);
         if (elec > stdElec)
           exceeded.push(
-            `${i18n.t("electricity_used")} (${i18n.t(
-              "allowed"
-            )}: ${stdElec}, ${i18n.t("used")}: ${elec})`
+            `${i18n.t("electricity_used")} (${i18n.t("allowed")}: ${stdElec}, ${i18n.t("used")}: ${elec})`,
           );
         if (water > stdWater)
           exceeded.push(
-            `${i18n.t("water_used")} (${i18n.t(
-              "allowed"
-            )}: ${stdWater}, ${i18n.t("used")}: ${water})`
+            `${i18n.t("water_used")} (${i18n.t("allowed")}: ${stdWater}, ${i18n.t("used")}: ${water})`,
           );
         if (chem > stdChem)
           exceeded.push(
-            `${i18n.t("chemicals_used")} (${i18n.t(
-              "allowed"
-            )}: ${stdChem}, ${i18n.t("used")}: ${chem})`
+            `${i18n.t("chemicals_used")} (${i18n.t("allowed")}: ${stdChem}, ${i18n.t("used")}: ${chem})`,
           );
         if (diesel > stdDiesel)
           exceeded.push(
-            `${i18n.t("diesel_used")} (${i18n.t(
-              "allowed"
-            )}: ${stdDiesel}, ${i18n.t("used")}: ${diesel})`
+            `${i18n.t("diesel_used")} (${i18n.t("allowed")}: ${stdDiesel}, ${i18n.t("used")}: ${diesel})`,
           );
-
         total =
           fabric * 0.2 + elec * 0.7 + water * 0.005 + chem * 0.2 + diesel * 1.2;
         normalizedVal = fabric > 0 ? total / fabric : 0;
         setStandardNormalized(0.6);
         setTips(
-          i18n.t("textile_tips", { returnObjects: true }) as unknown as string[]
+          i18n.t("textile_tips", {
+            returnObjects: true,
+          }) as unknown as string[],
         );
       } else if (industry === "dairy") {
         const milk = toNum(milk_produced);
-        const cowsCount = toNum(cows);
+        const cowsN = toNum(cows);
         const elec = toNum(electricity_used);
         const fodder = toNum(fodder_used);
         const diesel = toNum(diesel_used);
-
         const stdElec = milk * 0.25;
         const stdFodder = milk * 0.3;
         const stdDiesel = milk * 0.05;
-
         if (elec > stdElec)
           exceeded.push(
-            `${i18n.t("electricity_used")} (${i18n.t(
-              "allowed"
-            )}: ${stdElec}, ${i18n.t("used")}: ${elec})`
+            `${i18n.t("electricity_used")} (${i18n.t("allowed")}: ${stdElec}, ${i18n.t("used")}: ${elec})`,
           );
         if (fodder > stdFodder)
           exceeded.push(
-            `${i18n.t("fodder_used")} (${i18n.t(
-              "allowed"
-            )}: ${stdFodder}, ${i18n.t("used")}: ${fodder})`
+            `${i18n.t("fodder_used")} (${i18n.t("allowed")}: ${stdFodder}, ${i18n.t("used")}: ${fodder})`,
           );
         if (diesel > stdDiesel)
           exceeded.push(
-            `${i18n.t("diesel_used")} (${i18n.t(
-              "allowed"
-            )}: ${stdDiesel}, ${i18n.t("used")}: ${diesel})`
+            `${i18n.t("diesel_used")} (${i18n.t("allowed")}: ${stdDiesel}, ${i18n.t("used")}: ${diesel})`,
           );
-
         total =
-          milk * 0.1 + cowsCount * 5 + elec * 0.5 + fodder * 0.3 + diesel * 1.5;
+          milk * 0.1 + cowsN * 5 + elec * 0.5 + fodder * 0.3 + diesel * 1.5;
         normalizedVal = milk > 0 ? total / milk : 0;
         setStandardNormalized(0.8);
         setTips(
-          i18n.t("dairy_tips", { returnObjects: true }) as unknown as string[]
+          i18n.t("dairy_tips", { returnObjects: true }) as unknown as string[],
         );
       } else if (industry === "agriculture") {
         const land = toNum(land_area);
         const fert = toNum(fertilizer_used);
         const elec = toNum(electricity_used);
         const diesel = toNum(diesel_used);
-        const yieldCrop = toNum(crop_yield);
-
+        const yld = toNum(crop_yield);
         const stdFert = land * 0.5;
         const stdDiesel = land * 0.1;
         const stdElec = land * 1.0;
-
         if (fert > stdFert)
           exceeded.push(
-            `${i18n.t("fertilizer_used")} (${i18n.t(
-              "allowed"
-            )}: ${stdFert}, ${i18n.t("used")}: ${fert})`
+            `${i18n.t("fertilizer_used")} (${i18n.t("allowed")}: ${stdFert}, ${i18n.t("used")}: ${fert})`,
           );
         if (elec > stdElec)
           exceeded.push(
-            `${i18n.t("electricity_used")} (${i18n.t(
-              "allowed"
-            )}: ${stdElec}, ${i18n.t("used")}: ${elec})`
+            `${i18n.t("electricity_used")} (${i18n.t("allowed")}: ${stdElec}, ${i18n.t("used")}: ${elec})`,
           );
         if (diesel > stdDiesel)
           exceeded.push(
-            `${i18n.t("diesel_used")} (${i18n.t(
-              "allowed"
-            )}: ${stdDiesel}, ${i18n.t("used")}: ${diesel})`
+            `${i18n.t("diesel_used")} (${i18n.t("allowed")}: ${stdDiesel}, ${i18n.t("used")}: ${diesel})`,
           );
-
         total = fert * 0.6 + elec * 0.3 + diesel * 2;
-        normalizedVal = yieldCrop > 0 ? total / yieldCrop : 0;
+        normalizedVal = yld > 0 ? total / yld : 0;
         setStandardNormalized(0.5);
         setTips(
           i18n.t("agriculture_tips", {
             returnObjects: true,
-          }) as unknown as string[]
+          }) as unknown as string[],
         );
-      } else if (industry === "manufacturing") {
+      } else {
+        // manufacturing + all extended industries
         const units = toNum(units_produced);
         const elec = toNum(electricity_used);
         const water = toNum(water_used);
         const chem = toNum(chemicals_used);
         const diesel = toNum(diesel_used);
-
         const stdElec = units * 0.4;
         const stdWater = units * 10;
         const stdChem = units * 0.05;
         const stdDiesel = units * 0.1;
-
         if (elec > stdElec)
           exceeded.push(
-            `${i18n.t("electricity_used")} (${i18n.t(
-              "allowed"
-            )}: ${stdElec}, ${i18n.t("used")}: ${elec})`
+            `${i18n.t("electricity_used")} (${i18n.t("allowed")}: ${stdElec}, ${i18n.t("used")}: ${elec})`,
           );
         if (water > stdWater)
           exceeded.push(
-            `${i18n.t("water_used")} (${i18n.t(
-              "allowed"
-            )}: ${stdWater}, ${i18n.t("used")}: ${water})`
+            `${i18n.t("water_used")} (${i18n.t("allowed")}: ${stdWater}, ${i18n.t("used")}: ${water})`,
           );
         if (chem > stdChem)
           exceeded.push(
-            `${i18n.t("chemicals_used")} (${i18n.t(
-              "allowed"
-            )}: ${stdChem}, ${i18n.t("used")}: ${chem})`
+            `${i18n.t("chemicals_used")} (${i18n.t("allowed")}: ${stdChem}, ${i18n.t("used")}: ${chem})`,
           );
         if (diesel > stdDiesel)
           exceeded.push(
-            `${i18n.t("diesel_used")} (${i18n.t(
-              "allowed"
-            )}: ${stdDiesel}, ${i18n.t("used")}: ${diesel})`
+            `${i18n.t("diesel_used")} (${i18n.t("allowed")}: ${stdDiesel}, ${i18n.t("used")}: ${diesel})`,
           );
-
         total = elec * 0.6 + water * 0.05 + chem * 0.3 + diesel * 1.8;
         normalizedVal = units > 0 ? total / units : 0;
         setStandardNormalized(1.0);
         setTips(
           i18n.t("manufacturing_tips", {
             returnObjects: true,
-          }) as unknown as string[]
+          }) as unknown as string[],
         );
       }
 
@@ -249,12 +305,12 @@ const ResultScreen = () => {
         normalizedVal < 0.3
           ? 5
           : normalizedVal < 0.6
-          ? 4
-          : normalizedVal < 0.9
-          ? 3
-          : normalizedVal < 1.2
-          ? 2
-          : 1;
+            ? 4
+            : normalizedVal < 0.9
+              ? 3
+              : normalizedVal < 1.2
+                ? 2
+                : 1;
 
       const ratingKey = [
         "rating_poor",
@@ -263,260 +319,506 @@ const ResultScreen = () => {
         "rating_excellent",
         "rating_outstanding",
       ][stars - 1];
+      const finalScore = +total.toFixed(2);
+      const finalNorm = +normalizedVal.toFixed(2);
+      const ratingStr = `${i18n.t(ratingKey)} (${stars}/5)`;
+      const statusStr =
+        exceeded.length > 0
+          ? i18n.t("status_overuse")
+          : i18n.t("status_within");
 
-      setScore(Number(total.toFixed(2)));
-      setNormalized(Number(normalizedVal.toFixed(2)));
-      setRating(`${i18n.t(ratingKey)} (${stars}/5)`);
-      setStatus(
-        exceeded.length > 0 ? i18n.t("status_overuse") : i18n.t("status_within")
-      );
+      setScore(finalScore);
+      setNormalized(finalNorm);
+      setRating(ratingStr);
+      setStatus(statusStr);
+      setStarsCount(stars);
       setOverusedItems(exceeded);
+      setReady(true);
 
-      await addDoc(collection(db, "results"), {
-        vendorId,
-        industry,
-        formData,
-        score: Number(total.toFixed(2)),
-        normalized: Number(normalizedVal.toFixed(2)),
-        rating,
-        status,
-        tips,
-        exceeded,
-        createdAt: new Date().toISOString(),
-      });
+      // Animate score counting up
+      Animated.timing(scoreAnim, {
+        toValue: finalScore,
+        duration: 1200,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: false,
+      }).start();
+
+      // Header entrance
+      Animated.parallel([
+        Animated.timing(headerFade, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(headerSlide, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      // Glow loop
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(glowAnim, {
+            toValue: 1,
+            duration: 950,
+            useNativeDriver: false,
+          }),
+          Animated.timing(glowAnim, {
+            toValue: 0,
+            duration: 950,
+            useNativeDriver: false,
+          }),
+        ]),
+      ).start();
+
+      try {
+        await addDoc(collection(db, "results"), {
+          vendorId,
+          industry,
+          formData,
+          score: finalScore,
+          normalized: finalNorm,
+          rating: ratingStr,
+          status: statusStr,
+          tips: [],
+          exceeded,
+          createdAt: new Date().toISOString(),
+        });
+      } catch (e) {
+        console.error("Save error:", e);
+      }
     };
 
-    calculateResult();
+    calculate();
   }, []);
 
-  const renderStars = () => {
-    const starsCount =
-      normalized < 0.3
-        ? 5
-        : normalized < 0.6
-        ? 4
-        : normalized < 0.9
-        ? 3
-        : normalized < 1.2
-        ? 2
-        : 1;
+  const isOveruse = status.includes("⚠️");
+  const statusColor = isOveruse ? "#e03030" : "#28a048";
+  const statusBg = isOveruse ? "#fff0f0" : "#f0fce8";
+  const statusBorder = isOveruse ? "#ffb0b0" : "#b8e890";
 
-    return (
-      <View style={styles.starContainer}>
-        {Array.from({ length: 5 }).map((_, idx) => (
-          <Ionicons
-            key={idx}
-            name={idx < starsCount ? "star" : "star-outline"}
-            size={22}
-            color={idx < starsCount ? "#FFD700" : "#ccc"}
-            style={{ marginHorizontal: 2 }}
-          />
-        ))}
-      </View>
-    );
-  };
+  const glowSize = glowAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [6, 22],
+  });
+  const glowOpacity = glowAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.25, 0.58],
+  });
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.heading}>{i18n.t("carbon_footprint_results")}</Text>
-
-      <View style={styles.section}>
-        <Ionicons name="person-circle-outline" size={26} style={styles.icon} />
-        <Text style={styles.sectionText}>
-          <Text style={styles.label}>{i18n.t("vendor_id")}:</Text> {vendorId}
-        </Text>
-        <Text style={styles.sectionText}>
-          <Text style={styles.label}>{i18n.t("industry")}:</Text>{" "}
-          {i18n.t(industry ?? "unknown")}
-        </Text>
-      </View>
-
-      <View style={styles.section}>
-        <Ionicons name="leaf-outline" size={26} style={styles.icon} />
-        <Text style={styles.metricTitle}>{i18n.t("total_emission_score")}</Text>
-        <Text style={styles.metricValue}>{score}</Text>
-      </View>
-
-      <View style={styles.section}>
-        <Ionicons name="speedometer-outline" size={26} style={styles.icon} />
-        <Text style={styles.metricTitle}>
-          {i18n.t("normalized_emission_score")}
-        </Text>
-        <Text style={styles.metricValue}>
-          {normalized} {i18n.t("co2_per_unit")}
-        </Text>
-      </View>
-
-      <View style={styles.govtScoreCard}>
-        <View style={styles.govtIconWrapper}>
-          <Ionicons name="shield-checkmark-outline" size={24} color="#fff" />
-        </View>
-        <Text style={styles.govtScoreTitle}>
-          {i18n.t("govt_standard_normalized_score")}
-        </Text>
-        <Text style={styles.govtScoreValue}>
-          {standardNormalized} {i18n.t("co2_per_unit")}
-        </Text>
-      </View>
-
-      <View style={styles.section}>
-        <Ionicons name="star-outline" size={26} style={styles.icon} />
-        <Text style={styles.metricTitle}>{i18n.t("rating")}</Text>
-        {renderStars()}
-        <Text style={styles.sectionText}>{rating}</Text>
-      </View>
-
-      <View style={styles.section}>
-        <Ionicons name="alert-circle-outline" size={26} style={styles.icon} />
-        <Text
-          style={[
-            styles.statusText,
-            status.includes("⚠️") && styles.statusWarning,
-          ]}
+    <LinearGradient
+      colors={["#f0fce8", "#e4f7d4", "#d8f2be"]}
+      style={{ flex: 1 }}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+    >
+      <SafeAreaView style={{ flex: 1 }}>
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          showsVerticalScrollIndicator={false}
         >
-          {status}
-        </Text>
-      </View>
+          {/* ── HEADER ── */}
+          <Animated.View
+            style={{
+              opacity: headerFade,
+              transform: [{ translateY: headerSlide }],
+            }}
+          >
+            <LinearGradient
+              colors={["#ffffff", "#edfadf", "#dff7c8"]}
+              style={styles.headerCard}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <View style={styles.headerIconCircle}>
+                <Ionicons name="leaf-outline" size={26} color="#6ec832" />
+              </View>
+              <Text style={styles.heading}>
+                {i18n.t("carbon_footprint_results")}
+              </Text>
 
-      <TouchableOpacity
-        style={styles.nextButton}
-        onPress={() =>
-          router.push({
-            pathname: "/emissionBreakdown",
-            params: {
-              lang,
-              vendorId,
-              industry,
-              exceeded: overusedItems.join("||"),
-              tips: tips.join("||"),
-              score: score.toString(),
-              normalized: normalized.toString(),
-              rating,
-              status,
-              formData: JSON.stringify(formData),
-            },
-          })
-        }
-      >
-        <Text style={styles.nextButtonText}>{i18n.t("next")}</Text>
-        <Ionicons name="arrow-forward-outline" size={18} color="#fff" />
-      </TouchableOpacity>
-    </ScrollView>
+              {/* Vendor + industry chip row */}
+              <View style={styles.chipRow}>
+                <View style={styles.chip}>
+                  <Ionicons
+                    name="person-circle-outline"
+                    size={13}
+                    color="#5a8040"
+                  />
+                  <Text style={styles.chipText}>{vendorId}</Text>
+                </View>
+                <View style={styles.chip}>
+                  <Ionicons name="business-outline" size={13} color="#5a8040" />
+                  <Text style={styles.chipText}>
+                    {i18n.t(industry?.toString() ?? "unknown")}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Animated score counter */}
+              <View style={styles.scoreBig}>
+                <Animated.Text style={styles.scoreNumber}>
+                  {
+                    scoreAnim.interpolate({
+                      inputRange: [0, score || 1],
+                      outputRange: ["0", (score || 0).toFixed(2)],
+                    }) as any
+                  }
+                </Animated.Text>
+                <Text style={styles.scoreLabel}>
+                  {i18n.t("total_emission_score")}
+                </Text>
+              </View>
+            </LinearGradient>
+          </Animated.View>
+
+          {/* ── METRICS ROW ── */}
+          <View style={styles.metricRow}>
+            <MetricCard
+              icon="speedometer-outline"
+              title={i18n.t("normalized_emission_score")}
+              value={normalized.toFixed(2)}
+              sub={i18n.t("co2_per_unit")}
+              delay={200}
+              accent="#6ec832"
+            />
+            <MetricCard
+              icon="shield-checkmark-outline"
+              title={i18n.t("govt_standard_normalized_score")}
+              value={standardNormalized.toFixed(1)}
+              sub={i18n.t("co2_per_unit")}
+              delay={300}
+              accent="#38aae0"
+            />
+          </View>
+
+          {/* ── RATING CARD ── */}
+          {ready && (
+            <Animated.View>
+              <View style={styles.ratingCard}>
+                <View style={styles.sectionRow}>
+                  <View style={styles.accentBar} />
+                  <Text style={styles.sectionTitle}>{i18n.t("rating")}</Text>
+                </View>
+                <Stars count={starsCount} />
+                <Text style={styles.ratingText}>{rating}</Text>
+              </View>
+            </Animated.View>
+          )}
+
+          {/* ── STATUS CARD ── */}
+          {ready && (
+            <View
+              style={[
+                styles.statusCard,
+                { backgroundColor: statusBg, borderColor: statusBorder },
+              ]}
+            >
+              <View
+                style={[
+                  styles.statusIconCircle,
+                  { backgroundColor: statusColor + "18" },
+                ]}
+              >
+                <Ionicons
+                  name={
+                    isOveruse
+                      ? "alert-circle-outline"
+                      : "checkmark-circle-outline"
+                  }
+                  size={22}
+                  color={statusColor}
+                />
+              </View>
+              <Text style={[styles.statusText, { color: statusColor }]}>
+                {status}
+              </Text>
+            </View>
+          )}
+
+          {/* ── NEXT BUTTON — always glows ── */}
+          <View style={styles.btnWrapper}>
+            <Animated.View
+              style={[
+                styles.glowLayer,
+                { shadowRadius: glowSize, shadowOpacity: glowOpacity },
+              ]}
+            />
+            <TouchableOpacity
+              onPress={() =>
+                router.push({
+                  pathname: "/emissionBreakdown",
+                  params: {
+                    lang,
+                    vendorId,
+                    name,
+                    industry,
+                    exceeded: overusedItems.join("||"),
+                    tips: tips.join("||"),
+                    score: score.toString(),
+                    normalized: normalized.toString(),
+                    rating,
+                    status,
+                    formData: JSON.stringify(formData),
+                  },
+                })
+              }
+              activeOpacity={0.87}
+              style={styles.btnOuter}
+            >
+              <LinearGradient
+                colors={["#a8e858", "#6ec832", "#48a818"]}
+                style={styles.btnInner}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
+                <Text style={styles.btnText}>{i18n.t("next")}</Text>
+                <View style={styles.btnArrow}>
+                  <Ionicons name="arrow-forward" size={16} color="#fff" />
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 export default ResultScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FAFCFE",
-    padding: 24,
+  scroll: {
+    paddingHorizontal: 18,
+    paddingTop: 16,
+    paddingBottom: 48,
+    gap: 14,
+  },
+
+  /* Header */
+  headerCard: {
+    borderRadius: 22,
+    paddingVertical: 22,
+    paddingHorizontal: 20,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#c8eea0",
+    overflow: "hidden",
+  },
+  headerIconCircle: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: "#eaf8d8",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#c0e898",
   },
   heading: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "700",
-    color: "#0071CE",
-    marginBottom: 20,
+    color: "#1a4008",
     textAlign: "center",
-    marginTop: 40,
+    letterSpacing: -0.3,
   },
-  section: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    padding: 18,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
+  chipRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 10,
+    flexWrap: "wrap",
+    justifyContent: "center",
   },
-  icon: {
-    marginBottom: 10,
-    alignSelf: "center",
-    color: "#0071CE",
+  chip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    backgroundColor: "#eaf8d8",
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#c0e898",
   },
-  label: {
-    fontWeight: "600",
-    color: "#1A1A1A",
+  chipText: {
+    fontSize: 12,
+    color: "#3a6a20",
+    fontWeight: "500",
   },
-  sectionText: {
-    fontSize: 15,
-    color: "#333",
-    marginBottom: 6,
-    textAlign: "center",
+
+  /* Animated score */
+  scoreBig: {
+    alignItems: "center",
+    marginTop: 16,
+    backgroundColor: "#f0fce8",
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderWidth: 1,
+    borderColor: "#c8eea0",
+    width: "100%",
+  },
+  scoreNumber: {
+    fontSize: 48,
+    fontWeight: "700",
+    color: "#1a4008",
+    letterSpacing: -1,
+    lineHeight: 54,
+  },
+  scoreLabel: {
+    fontSize: 12,
+    color: "#5a8040",
+    marginTop: 4,
+    fontWeight: "500",
+  },
+
+  /* Metric cards */
+  metricRow: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  metricCard: {
+    flex: 1,
+    backgroundColor: "rgba(255,255,255,0.85)",
+    borderRadius: 18,
+    padding: 16,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#caeaa8",
+    gap: 6,
+  },
+  metricIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    marginBottom: 2,
   },
   metricTitle: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 11,
+    color: "#5a8040",
     textAlign: "center",
-    marginBottom: 6,
-    color: "#0071CE",
+    fontWeight: "500",
+    lineHeight: 15,
   },
   metricValue: {
     fontSize: 22,
-    fontWeight: "800",
-    textAlign: "center",
-    color: "#1A1A1A",
-  },
-  govtScoreCard: {
-    backgroundColor: "#E3F2FD",
-    borderRadius: 14,
-    paddingVertical: 24,
-    paddingHorizontal: 20,
-    marginBottom: 16,
-    alignItems: "center",
-    borderWidth: 1.2,
-    borderColor: "#2196F3",
-  },
-  govtIconWrapper: {
-    backgroundColor: "#2196F3",
-    padding: 10,
-    borderRadius: 40,
-    marginBottom: 12,
-  },
-  govtScoreTitle: {
-    fontSize: 16,
-    color: "#0D47A1",
-    fontWeight: "600",
-    marginBottom: 4,
-    textAlign: "center",
-  },
-  govtScoreValue: {
-    fontSize: 20,
     fontWeight: "700",
-    color: "#1A1A1A",
-    textAlign: "center",
+    letterSpacing: -0.5,
   },
-  starContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginVertical: 6,
+  metricSub: {
+    fontSize: 10,
+    color: "#8aba70",
+    fontWeight: "500",
   },
-  statusText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "green",
-    textAlign: "center",
+
+  /* Rating */
+  ratingCard: {
+    backgroundColor: "rgba(255,255,255,0.85)",
+    borderRadius: 20,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: "#caeaa8",
+    alignItems: "center",
   },
-  statusWarning: {
-    color: "#E53935",
-  },
-  nextButton: {
-    backgroundColor: "#0071CE",
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginTop: 20,
-    alignSelf: "center", // Center horizontally
+  sectionRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    marginBottom: 50,
+    marginBottom: 14,
+    alignSelf: "flex-start",
   },
-  nextButtonText: {
-    color: "#fff",
+  accentBar: {
+    width: 4,
+    height: 20,
+    borderRadius: 2,
+    backgroundColor: "#6ec832",
+  },
+  sectionTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#1a4008",
+  },
+  starRow: {
+    flexDirection: "row",
+    marginBottom: 10,
+  },
+  ratingText: {
     fontSize: 15,
     fontWeight: "600",
+    color: "#3a6a20",
+  },
+
+  /* Status */
+  statusCard: {
+    borderRadius: 18,
+    padding: 16,
+    borderWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  statusIconCircle: {
+    width: 42,
+    height: 42,
+    borderRadius: 13,
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  statusText: {
+    fontSize: 14,
+    fontWeight: "600",
+    flex: 1,
+    lineHeight: 20,
+  },
+
+  /* Next button */
+  btnWrapper: {
+    position: "relative",
+    alignItems: "stretch",
+  },
+  glowLayer: {
+    position: "absolute",
+    top: 6,
+    left: 10,
+    right: 10,
+    bottom: 6,
+    borderRadius: 16,
+    backgroundColor: "transparent",
+    shadowColor: "#6ec832",
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 0,
+  },
+  btnOuter: {
+    borderRadius: 16,
+    overflow: "hidden",
+  },
+  btnInner: {
+    paddingVertical: 17,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+  },
+  btnText: {
+    color: "#ffffff",
+    fontSize: 17,
+    fontWeight: "700",
+    letterSpacing: 0.3,
+  },
+  btnArrow: {
+    width: 30,
+    height: 30,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.22)",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

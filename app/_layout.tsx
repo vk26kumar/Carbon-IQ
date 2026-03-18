@@ -8,9 +8,20 @@ export default function RootLayout() {
       <Stack
         screenOptions={{
           headerShown: false,
+          contentStyle: { backgroundColor: "#f0fce8" },
+          animation: "slide_from_right",
         }}
       >
         <Stack.Screen name="index" />
+        <Stack.Screen name="home" />
+        <Stack.Screen name="onboard" />
+        <Stack.Screen name="form" />
+        <Stack.Screen name="results" />
+        <Stack.Screen name="emissionBreakdown" />
+        <Stack.Screen name="detailAnalysis" />
+        <Stack.Screen name="message" />
+        <Stack.Screen name="carbonOffset" />
+        <Stack.Screen name="pdfReport" />
       </Stack>
     </GestureHandlerRootView>
   );
@@ -19,5 +30,6 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f0fce8",
   },
 });
