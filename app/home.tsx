@@ -1,4 +1,5 @@
 import i18n from "@/utils/i18n";
+import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef } from "react";
@@ -12,7 +13,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// ── Feature cards data (all keys exist in i18n) ───────────────────────────────
 const FEATURES = [
   {
     key: "feature_tracking",
@@ -34,7 +34,6 @@ const FEATURES = [
   },
 ];
 
-// ── Step row component ────────────────────────────────────────────────────────
 function StepRow({
   number,
   text,
@@ -79,14 +78,12 @@ function StepRow({
   );
 }
 
-// ── Main screen ───────────────────────────────────────────────────────────────
 export default function Home() {
   const router = useRouter();
   const { lang } = useLocalSearchParams();
 
   if (lang) i18n.locale = lang.toString();
 
-  // Entrance animations
   const fadeHero = useRef(new Animated.Value(0)).current;
   const slideHero = useRef(new Animated.Value(-20)).current;
   const fadeCards = useRef(new Animated.Value(0)).current;
@@ -152,10 +149,8 @@ export default function Home() {
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             >
-              {/* Decorative dots */}
               <View style={styles.dotTR} />
               <View style={styles.dotBL} />
-
               <Text style={styles.heroTitle}>
                 {i18n.t("carbon_toolkit_title")}
               </Text>
@@ -220,23 +215,26 @@ export default function Home() {
             }}
           >
             <TouchableOpacity
-              activeOpacity={0.88}
+              activeOpacity={0.82}
               onPress={() =>
                 router.push({ pathname: "/onboard", params: { lang } })
               }
               style={styles.ctaWrap}
             >
               <LinearGradient
-                colors={["#90d84a", "#6ec832", "#54b820"]}
+                colors={["#edfadf", "#d4f5a8", "#c2ee8a"]}
                 style={styles.ctaBtn}
                 start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
+                end={{ x: 1, y: 1 }}
               >
+                <View style={styles.ctaIconWrap}>
+                  <Ionicons name="business-outline" size={16} color="#3a7a10" />
+                </View>
                 <Text style={styles.ctaText}>
                   {i18n.t("vendor_registration")}
                 </Text>
                 <View style={styles.ctaArrow}>
-                  <Text style={styles.ctaArrowText}>›</Text>
+                  <Ionicons name="arrow-forward" size={13} color="#3a7a10" />
                 </View>
               </LinearGradient>
             </TouchableOpacity>
@@ -247,7 +245,6 @@ export default function Home() {
   );
 }
 
-// ── Styles ────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   gradientBg: {
     flex: 1,
@@ -404,40 +401,48 @@ const styles = StyleSheet.create({
 
   /* ── CTA ── */
   ctaWrap: {
-    borderRadius: 16,
+    borderRadius: 14,
     overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#b8e890",
     shadowColor: "#6ec832",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 3,
   },
   ctaBtn: {
-    paddingVertical: 16,
-    paddingHorizontal: 28,
+    paddingVertical: 11,
+    paddingHorizontal: 16,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
+    gap: 10,
   },
-  ctaText: {
-    color: "#ffffff",
-    fontSize: 16,
-    fontWeight: "700",
-    letterSpacing: 0.3,
-  },
-  ctaArrow: {
-    width: 28,
-    height: 28,
-    borderRadius: 8,
-    backgroundColor: "rgba(255,255,255,0.25)",
+  ctaIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.7)",
+    borderWidth: 1,
+    borderColor: "#c0e898",
     alignItems: "center",
     justifyContent: "center",
   },
-  ctaArrowText: {
-    color: "#ffffff",
-    fontSize: 20,
+  ctaText: {
+    flex: 1,
+    fontSize: 13,
     fontWeight: "700",
-    lineHeight: 24,
+    color: "#2a6008",
+    letterSpacing: 0.2,
+  },
+  ctaArrow: {
+    width: 26,
+    height: 26,
+    borderRadius: 8,
+    backgroundColor: "rgba(255,255,255,0.7)",
+    borderWidth: 1,
+    borderColor: "#c0e898",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

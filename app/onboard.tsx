@@ -40,6 +40,7 @@ function FormInput({
   onChangeText,
   placeholder,
   keyboardType = "default",
+  maxLength,
 }: {
   label: string;
   icon: any;
@@ -47,6 +48,7 @@ function FormInput({
   onChangeText: (t: string) => void;
   placeholder: string;
   keyboardType?: any;
+  maxLength?: number;
 }) {
   const [focused, setFocused] = useState(false);
   const borderAnim = useRef(new Animated.Value(0)).current;
@@ -93,6 +95,7 @@ function FormInput({
           keyboardType={keyboardType}
           onFocus={onFocus}
           onBlur={onBlur}
+          maxLength={maxLength}
         />
         {value.length > 0 && (
           <Ionicons
@@ -122,40 +125,41 @@ const Onboard = () => {
   const pageFade = useRef(new Animated.Value(0)).current;
   const pageSlide = useRef(new Animated.Value(28)).current;
 
-  // Always-glowing pulse
-  const glowAnim = useRef(new Animated.Value(0)).current;
+  // CTA button animation (same as Home)
+  const scaleBtn = useRef(new Animated.Value(0.94)).current;
+  const fadeBtn = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (lang) i18n.locale = lang.toString();
 
-    Animated.parallel([
-      Animated.timing(pageFade, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-      }),
-      Animated.timing(pageSlide, {
-        toValue: 0,
-        duration: 500,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-    ]).start();
-
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(glowAnim, {
+    Animated.sequence([
+      Animated.parallel([
+        Animated.timing(pageFade, {
           toValue: 1,
-          duration: 1000,
-          useNativeDriver: false,
+          duration: 500,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
         }),
-        Animated.timing(glowAnim, {
+        Animated.timing(pageSlide, {
           toValue: 0,
-          duration: 1000,
-          useNativeDriver: false,
+          duration: 500,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
         }),
       ]),
-    ).start();
+      Animated.parallel([
+        Animated.timing(fadeBtn, {
+          toValue: 1,
+          duration: 350,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleBtn, {
+          toValue: 1,
+          duration: 350,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
   }, []);
 
   const isFormValid = !!(vendorId && name && mobile && industry);
@@ -163,6 +167,13 @@ const Onboard = () => {
   const handleNext = async () => {
     if (!isFormValid) {
       Alert.alert(i18n.t("fill_all_fields"));
+      return;
+    }
+    if (mobile.length !== 10) {
+      Alert.alert(
+        "Invalid Mobile",
+        "Please enter a valid 10-digit mobile number.",
+      );
       return;
     }
     setLoading(true);
@@ -184,15 +195,6 @@ const Onboard = () => {
       setLoading(false);
     }
   };
-
-  const glowSize = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [6, 20],
-  });
-  const glowOpacity = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.3, 0.65],
-  });
 
   return (
     <LinearGradient
@@ -269,9 +271,12 @@ const Onboard = () => {
                   label={i18n.t("mobile")}
                   icon="call-outline"
                   value={mobile}
-                  onChangeText={setMobile}
+                  onChangeText={(t) =>
+                    setMobile(t.replace(/[^0-9]/g, "").slice(0, 10))
+                  }
                   placeholder={i18n.t("mobile_placeholder")}
                   keyboardType="phone-pad"
+                  maxLength={10}
                 />
               </View>
 
@@ -299,7 +304,6 @@ const Onboard = () => {
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 1 }}
                           >
-                            {/* ── SAME SIZE ICON CIRCLE always ── */}
                             <View style={styles.iconCircleSel}>
                               <Ionicons
                                 name={icon as any}
@@ -337,41 +341,45 @@ const Onboard = () => {
                 </View>
               </View>
 
-              {/* ── NEXT BUTTON — inside scroll, always glows ── */}
-              <View style={styles.btnWrapper}>
-                {/* Glow shadow layer */}
-                <Animated.View
-                  style={[
-                    styles.glowLayer,
-                    {
-                      shadowRadius: glowSize,
-                      shadowOpacity: glowOpacity,
-                    },
-                  ]}
-                />
+              {/* ── CTA BUTTON (same style as Home page) ── */}
+              <Animated.View
+                style={{
+                  opacity: fadeBtn,
+                  transform: [{ scale: scaleBtn }],
+                }}
+              >
                 <TouchableOpacity
+                  activeOpacity={0.82}
                   onPress={handleNext}
-                  activeOpacity={0.87}
                   disabled={loading}
-                  style={styles.btnOuter}
+                  style={styles.ctaWrap}
                 >
                   <LinearGradient
-                    colors={["#a8e858", "#6ec832", "#48a818"]}
-                    style={styles.btnInner}
+                    colors={["#edfadf", "#d4f5a8", "#c2ee8a"]}
+                    style={styles.ctaBtn}
                     start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
+                    end={{ x: 1, y: 1 }}
                   >
-                    <Text style={styles.btnText}>
+                    <View style={styles.ctaIconWrap}>
+                      <Ionicons
+                        name="storefront-outline"
+                        size={16}
+                        color="#3a7a10"
+                      />
+                    </View>
+                    <Text style={styles.ctaText}>
                       {loading ? "..." : i18n.t("next")}
                     </Text>
-                    {!loading && (
-                      <View style={styles.btnArrow}>
-                        <Ionicons name="arrow-forward" size={16} color="#fff" />
-                      </View>
-                    )}
+                    <View style={styles.ctaArrow}>
+                      <Ionicons
+                        name="arrow-forward"
+                        size={13}
+                        color="#3a7a10"
+                      />
+                    </View>
                   </LinearGradient>
                 </TouchableOpacity>
-              </View>
+              </Animated.View>
             </Animated.View>
           </ScrollView>
         </KeyboardAvoidingView>
@@ -540,7 +548,6 @@ const styles = StyleSheet.create({
     gap: 8,
     minHeight: 82,
   },
-  /* Identical size icon circles for both states */
   iconCircle: {
     width: 40,
     height: 40,
@@ -572,46 +579,49 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  /* Next button — inside scroll, always glows */
-  btnWrapper: {
-    marginTop: 6,
-    position: "relative",
-    alignItems: "stretch",
-  },
-  glowLayer: {
-    position: "absolute",
-    top: 6,
-    left: 10,
-    right: 10,
-    bottom: 6,
-    borderRadius: 16,
-    backgroundColor: "transparent",
-    shadowColor: "#6ec832",
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 0,
-  },
-  btnOuter: {
-    borderRadius: 16,
+  /* ── CTA Button (matches Home page exactly) ── */
+  ctaWrap: {
+    borderRadius: 14,
     overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#b8e890",
+    shadowColor: "#6ec832",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  btnInner: {
-    paddingVertical: 17,
+  ctaBtn: {
+    paddingVertical: 11,
+    paddingHorizontal: 16,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
+    gap: 10,
   },
-  btnText: {
-    color: "#ffffff",
-    fontSize: 17,
-    fontWeight: "700",
-    letterSpacing: 0.3,
-  },
-  btnArrow: {
-    width: 30,
-    height: 30,
+  ctaIconWrap: {
+    width: 32,
+    height: 32,
     borderRadius: 10,
-    backgroundColor: "rgba(255,255,255,0.22)",
+    backgroundColor: "rgba(255,255,255,0.7)",
+    borderWidth: 1,
+    borderColor: "#c0e898",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  ctaText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#2a6008",
+    letterSpacing: 0.2,
+  },
+  ctaArrow: {
+    width: 26,
+    height: 26,
+    borderRadius: 8,
+    backgroundColor: "rgba(255,255,255,0.7)",
+    borderWidth: 1,
+    borderColor: "#c0e898",
     alignItems: "center",
     justifyContent: "center",
   },

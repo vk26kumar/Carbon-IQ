@@ -82,7 +82,8 @@ export default function PDFReportScreen() {
   const headerFade = useRef(new Animated.Value(0)).current;
   const headerSlide = useRef(new Animated.Value(-18)).current;
   const bodyFade = useRef(new Animated.Value(0)).current;
-  const glowAnim = useRef(new Animated.Value(0)).current;
+  const scaleBtn = useRef(new Animated.Value(0.94)).current;
+  const fadeBtn = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.sequence([
@@ -103,22 +104,19 @@ export default function PDFReportScreen() {
         duration: 400,
         useNativeDriver: true,
       }),
-    ]).start();
-
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(glowAnim, {
+      Animated.parallel([
+        Animated.timing(fadeBtn, {
           toValue: 1,
-          duration: 950,
-          useNativeDriver: false,
+          duration: 350,
+          useNativeDriver: true,
         }),
-        Animated.timing(glowAnim, {
-          toValue: 0,
-          duration: 950,
-          useNativeDriver: false,
+        Animated.timing(scaleBtn, {
+          toValue: 1,
+          duration: 350,
+          useNativeDriver: true,
         }),
       ]),
-    ).start();
+    ]).start();
   }, []);
 
   const parsedTips: string[] =
@@ -158,15 +156,6 @@ export default function PDFReportScreen() {
       setLoading(false);
     }
   };
-
-  const glowSize = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [6, 22],
-  });
-  const glowOpacity = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.25, 0.58],
-  });
 
   return (
     <LinearGradient
@@ -208,7 +197,7 @@ export default function PDFReportScreen() {
                 <View style={{ width: 36 }} />
               </View>
 
-              {/* Vendor chips — name + id + industry */}
+              {/* Vendor chips */}
               <View style={styles.chipRow}>
                 <View style={styles.infoChip}>
                   <Ionicons
@@ -235,7 +224,6 @@ export default function PDFReportScreen() {
           {/* ── PREVIEW CARD ── */}
           <Animated.View style={{ opacity: bodyFade }}>
             <View style={styles.previewCard}>
-              {/* Mock PDF header */}
               <View style={styles.mockHeader}>
                 <View>
                   <Text style={styles.mockTitle}>Carbon IQ</Text>
@@ -251,7 +239,6 @@ export default function PDFReportScreen() {
               </View>
               <View style={styles.mockDivider} />
 
-              {/* Preview rows — name + id included */}
               <PreviewRow
                 label="Vendor Name"
                 value={name?.toString() ?? vendorId?.toString() ?? "-"}
@@ -343,38 +330,49 @@ export default function PDFReportScreen() {
             </View>
           </Animated.View>
 
-          {/* ── EXPORT BUTTON — always glows ── */}
-          <View style={styles.btnWrapper}>
-            <Animated.View
-              style={[
-                styles.glowLayer,
-                { shadowRadius: glowSize, shadowOpacity: glowOpacity },
-              ]}
-            />
+          {/* ── CTA BUTTON (matches Home page style) ── */}
+          <Animated.View
+            style={{
+              opacity: fadeBtn,
+              transform: [{ scale: scaleBtn }],
+            }}
+          >
             <TouchableOpacity
+              activeOpacity={0.82}
               onPress={handleExport}
-              activeOpacity={0.87}
               disabled={loading}
-              style={styles.btnOuter}
+              style={styles.ctaWrap}
             >
               <LinearGradient
                 colors={
                   loading
-                    ? ["#c8e8b0", "#b0d890"]
-                    : ["#a8e858", "#6ec832", "#48a818"]
+                    ? ["#e4f7d4", "#d0f0b8", "#bce8a0"]
+                    : ["#edfadf", "#d4f5a8", "#c2ee8a"]
                 }
-                style={styles.btnInner}
+                style={styles.ctaBtn}
                 start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
+                end={{ x: 1, y: 1 }}
               >
-                <Ionicons name="document-text-outline" size={18} color="#fff" />
-                <Text style={styles.btnText}>
+                <View style={styles.ctaIconWrap}>
+                  <Ionicons
+                    name="document-text-outline"
+                    size={16}
+                    color={loading ? "#8aba70" : "#3a7a10"}
+                  />
+                </View>
+                <Text style={[styles.ctaText, loading && { color: "#8aba70" }]}>
                   {loading ? "Generating PDF..." : "Export & Share PDF"}
                 </Text>
+                {!loading && (
+                  <View style={styles.ctaArrow}>
+                    <Ionicons name="arrow-forward" size={13} color="#3a7a10" />
+                  </View>
+                )}
               </LinearGradient>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
 
+          {/* Back link */}
           <TouchableOpacity
             onPress={() => router.back()}
             style={styles.backLink}
@@ -517,35 +515,54 @@ const styles = StyleSheet.create({
   },
   infoText: { flex: 1, fontSize: 13, color: "#1a5a80", lineHeight: 19 },
 
-  /* Glow button */
-  btnWrapper: { position: "relative", alignItems: "stretch" },
-  glowLayer: {
-    position: "absolute",
-    top: 6,
-    left: 10,
-    right: 10,
-    bottom: 6,
-    borderRadius: 16,
-    backgroundColor: "transparent",
+  /* ── CTA Button (matches Home page exactly) ── */
+  ctaWrap: {
+    borderRadius: 14,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#b8e890",
     shadowColor: "#6ec832",
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 0,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  btnOuter: { borderRadius: 16, overflow: "hidden" },
-  btnInner: {
-    paddingVertical: 17,
+  ctaBtn: {
+    paddingVertical: 11,
+    paddingHorizontal: 16,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
+    gap: 10,
   },
-  btnText: {
-    color: "#ffffff",
-    fontSize: 17,
+  ctaIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.7)",
+    borderWidth: 1,
+    borderColor: "#c0e898",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  ctaText: {
+    flex: 1,
+    fontSize: 13,
     fontWeight: "700",
-    letterSpacing: 0.3,
+    color: "#2a6008",
+    letterSpacing: 0.2,
+  },
+  ctaArrow: {
+    width: 26,
+    height: 26,
+    borderRadius: 8,
+    backgroundColor: "rgba(255,255,255,0.7)",
+    borderWidth: 1,
+    borderColor: "#c0e898",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
+  /* Back link */
   backLink: { alignItems: "center", paddingVertical: 4 },
   backLinkText: { fontSize: 14, color: "#5a8040" },
 });
