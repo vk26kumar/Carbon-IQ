@@ -20,8 +20,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 // ─── Industry config ──────────────────────────────────────────────────────────
-// Each industry has its own logically correct fields matching original app logic
-// food_processing / logistics / electronics / pharmaceuticals are new additions
 const INDUSTRY_CONFIG: Record<
   string,
   {
@@ -35,7 +33,6 @@ const INDUSTRY_CONFIG: Record<
     }[];
   }
 > = {
-  // ── Original 4 (exact same required keys as your original handleSubmit) ──
   textile: {
     icon: "shirt-outline",
     color: "#6ec832",
@@ -84,8 +81,6 @@ const INDUSTRY_CONFIG: Record<
       { key: "diesel_used", icon: "speedometer-outline", unit: "L" },
     ],
   },
-
-  // ── Extended 4 with logical field sets ──
   food_processing: {
     icon: "restaurant-outline",
     color: "#d09020",
@@ -244,6 +239,7 @@ function FieldInput({
           placeholderTextColor="#b8d8a8"
           onFocus={onFocus}
           onBlur={onBlur}
+          returnKeyType="next"
         />
         <View
           style={[styles.unitBadge, { backgroundColor: accentColor + "18" }]}
@@ -265,39 +261,38 @@ const FormScreen = () => {
 
   const headerFade = useRef(new Animated.Value(0)).current;
   const headerSlide = useRef(new Animated.Value(-18)).current;
-  const glowAnim = useRef(new Animated.Value(0)).current;
+  const scaleBtn = useRef(new Animated.Value(0.94)).current;
+  const fadeBtn = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (lang) i18n.locale = lang.toString();
 
-    Animated.parallel([
-      Animated.timing(headerFade, {
-        toValue: 1,
-        duration: 480,
-        useNativeDriver: true,
-      }),
-      Animated.timing(headerSlide, {
-        toValue: 0,
-        duration: 480,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
-    // Always-glowing button pulse
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(glowAnim, {
+    Animated.sequence([
+      Animated.parallel([
+        Animated.timing(headerFade, {
           toValue: 1,
-          duration: 950,
-          useNativeDriver: false,
+          duration: 480,
+          useNativeDriver: true,
         }),
-        Animated.timing(glowAnim, {
+        Animated.timing(headerSlide, {
           toValue: 0,
-          duration: 950,
-          useNativeDriver: false,
+          duration: 480,
+          useNativeDriver: true,
         }),
       ]),
-    ).start();
+      Animated.parallel([
+        Animated.timing(fadeBtn, {
+          toValue: 1,
+          duration: 350,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleBtn, {
+          toValue: 1,
+          duration: 350,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
   }, []);
 
   const handleChange = (key: string, value: string) => {
@@ -342,15 +337,6 @@ const FormScreen = () => {
     }
   };
 
-  const glowSize = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [6, 22],
-  });
-  const glowOpacity = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.25, 0.58],
-  });
-
   return (
     <LinearGradient
       colors={["#f0fce8", "#e4f7d4", "#d8f2be"]}
@@ -359,16 +345,16 @@ const FormScreen = () => {
       end={{ x: 1, y: 1 }}
     >
       <SafeAreaView style={{ flex: 1 }}>
-        {/* KeyboardAvoidingView only wraps — does NOT create a fixed bottom bar */}
         <KeyboardAvoidingView
           style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 20 : 0}
         >
           <ScrollView
             contentContainerStyle={styles.scroll}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
           >
             {/* ── HEADER CARD ── */}
             <Animated.View
@@ -383,7 +369,6 @@ const FormScreen = () => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               >
-                {/* Large industry icon */}
                 <View
                   style={[
                     styles.industryCircle,
@@ -400,7 +385,6 @@ const FormScreen = () => {
                   {i18n.t("industry")}: {i18n.t(industryKey)}
                 </Text>
 
-                {/* Vendor chip */}
                 <View style={styles.vendorChip}>
                   <Ionicons
                     name="person-circle-outline"
@@ -455,43 +439,41 @@ const FormScreen = () => {
               ))}
             </View>
 
-            {/* ── SUBMIT BUTTON — last item in scroll, never fixed ── */}
-            <View style={styles.btnWrapper}>
-              <Animated.View
-                style={[
-                  styles.glowLayer,
-                  {
-                    shadowColor: accentColor,
-                    shadowRadius: glowSize,
-                    shadowOpacity: glowOpacity,
-                  },
-                ]}
-              />
+            {/* ── CTA BUTTON (matches Home page style) ── */}
+            <Animated.View
+              style={{
+                opacity: fadeBtn,
+                transform: [{ scale: scaleBtn }],
+              }}
+            >
               <TouchableOpacity
+                activeOpacity={0.82}
                 onPress={handleSubmit}
-                activeOpacity={0.87}
                 disabled={loading}
-                style={styles.btnOuter}
+                style={styles.ctaWrap}
               >
                 <LinearGradient
-                  colors={["#a8e858", "#6ec832", "#48a818"]}
-                  style={styles.btnInner}
+                  colors={["#edfadf", "#d4f5a8", "#c2ee8a"]}
+                  style={styles.ctaBtn}
                   start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
+                  end={{ x: 1, y: 1 }}
                 >
-                  {loading ? (
-                    <Text style={styles.btnText}>...</Text>
-                  ) : (
-                    <>
-                      <Text style={styles.btnText}>{i18n.t("submit")}</Text>
-                      <View style={styles.btnArrow}>
-                        <Ionicons name="arrow-forward" size={16} color="#fff" />
-                      </View>
-                    </>
-                  )}
+                  <View style={styles.ctaIconWrap}>
+                    <Ionicons
+                      name="checkmark-done-outline"
+                      size={16}
+                      color="#3a7a10"
+                    />
+                  </View>
+                  <Text style={styles.ctaText}>
+                    {loading ? "..." : i18n.t("submit")}
+                  </Text>
+                  <View style={styles.ctaArrow}>
+                    <Ionicons name="arrow-forward" size={13} color="#3a7a10" />
+                  </View>
                 </LinearGradient>
               </TouchableOpacity>
-            </View>
+            </Animated.View>
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -505,7 +487,7 @@ const styles = StyleSheet.create({
   scroll: {
     paddingHorizontal: 18,
     paddingTop: 16,
-    paddingBottom: 48, // enough space so button never hides behind anything
+    paddingBottom: 48,
     gap: 14,
   },
 
@@ -653,44 +635,49 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
-  /* Submit button — lives inside scroll */
-  btnWrapper: {
-    position: "relative",
-    alignItems: "stretch",
-  },
-  glowLayer: {
-    position: "absolute",
-    top: 6,
-    left: 10,
-    right: 10,
-    bottom: 6,
-    borderRadius: 16,
-    backgroundColor: "transparent",
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 0,
-  },
-  btnOuter: {
-    borderRadius: 16,
+  /* ── CTA Button (matches Home page exactly) ── */
+  ctaWrap: {
+    borderRadius: 14,
     overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#b8e890",
+    shadowColor: "#6ec832",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  btnInner: {
-    paddingVertical: 17,
+  ctaBtn: {
+    paddingVertical: 11,
+    paddingHorizontal: 16,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
+    gap: 10,
   },
-  btnText: {
-    color: "#ffffff",
-    fontSize: 17,
-    fontWeight: "700",
-    letterSpacing: 0.3,
-  },
-  btnArrow: {
-    width: 30,
-    height: 30,
+  ctaIconWrap: {
+    width: 32,
+    height: 32,
     borderRadius: 10,
-    backgroundColor: "rgba(255,255,255,0.22)",
+    backgroundColor: "rgba(255,255,255,0.7)",
+    borderWidth: 1,
+    borderColor: "#c0e898",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  ctaText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#2a6008",
+    letterSpacing: 0.2,
+  },
+  ctaArrow: {
+    width: 26,
+    height: 26,
+    borderRadius: 8,
+    backgroundColor: "rgba(255,255,255,0.7)",
+    borderWidth: 1,
+    borderColor: "#c0e898",
     alignItems: "center",
     justifyContent: "center",
   },

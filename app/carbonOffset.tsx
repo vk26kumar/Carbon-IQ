@@ -153,54 +153,44 @@ export default function CarbonOffsetScreen() {
 
   const headerFade = useRef(new Animated.Value(0)).current;
   const headerSlide = useRef(new Animated.Value(-18)).current;
-  const glowAnim = useRef(new Animated.Value(0)).current;
+  const scaleBtn = useRef(new Animated.Value(0.94)).current;
+  const fadeBtn = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(headerFade, {
-        toValue: 1,
-        duration: 480,
-        useNativeDriver: true,
-      }),
-      Animated.timing(headerSlide, {
-        toValue: 0,
-        duration: 480,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(glowAnim, {
+    Animated.sequence([
+      Animated.parallel([
+        Animated.timing(headerFade, {
           toValue: 1,
-          duration: 950,
-          useNativeDriver: false,
+          duration: 480,
+          useNativeDriver: true,
         }),
-        Animated.timing(glowAnim, {
+        Animated.timing(headerSlide, {
           toValue: 0,
-          duration: 950,
-          useNativeDriver: false,
+          duration: 480,
+          useNativeDriver: true,
         }),
       ]),
-    ).start();
+      Animated.parallel([
+        Animated.timing(fadeBtn, {
+          toValue: 1,
+          duration: 350,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleBtn, {
+          toValue: 1,
+          duration: 350,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
   }, []);
 
-  const glowSize = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [6, 22],
-  });
-  const glowOpacity = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.25, 0.58],
-  });
-
-  const scoreNum = numScore;
   const ratingColor =
-    scoreNum < 30 ? "#28a048" : scoreNum < 60 ? "#f0b429" : "#e03030";
+    numScore < 30 ? "#28a048" : numScore < 60 ? "#f0b429" : "#e03030";
   const ratingLabel =
-    scoreNum < 30
+    numScore < 30
       ? "Low Impact"
-      : scoreNum < 60
+      : numScore < 60
         ? "Moderate Impact"
         : "High Impact";
 
@@ -307,15 +297,15 @@ export default function CarbonOffsetScreen() {
             <OffsetCard key={item.label} item={item} index={i} />
           ))}
 
-          {/* ── PDF BUTTON — always glows ── */}
-          <View style={styles.btnWrapper}>
-            <Animated.View
-              style={[
-                styles.glowLayer,
-                { shadowRadius: glowSize, shadowOpacity: glowOpacity },
-              ]}
-            />
+          {/* ── CTA BUTTON (matches Home page style) ── */}
+          <Animated.View
+            style={{
+              opacity: fadeBtn,
+              transform: [{ scale: scaleBtn }],
+            }}
+          >
             <TouchableOpacity
+              activeOpacity={0.82}
               onPress={() =>
                 router.push({
                   pathname: "/pdfReport",
@@ -329,20 +319,28 @@ export default function CarbonOffsetScreen() {
                   },
                 })
               }
-              activeOpacity={0.87}
-              style={styles.btnOuter}
+              style={styles.ctaWrap}
             >
               <LinearGradient
-                colors={["#a8e858", "#6ec832", "#48a818"]}
-                style={styles.btnInner}
+                colors={["#edfadf", "#d4f5a8", "#c2ee8a"]}
+                style={styles.ctaBtn}
                 start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
+                end={{ x: 1, y: 1 }}
               >
-                <Ionicons name="document-text-outline" size={18} color="#fff" />
-                <Text style={styles.btnText}>Export PDF Report</Text>
+                <View style={styles.ctaIconWrap}>
+                  <Ionicons
+                    name="document-text-outline"
+                    size={16}
+                    color="#3a7a10"
+                  />
+                </View>
+                <Text style={styles.ctaText}>Export PDF Report</Text>
+                <View style={styles.ctaArrow}>
+                  <Ionicons name="arrow-forward" size={13} color="#3a7a10" />
+                </View>
               </LinearGradient>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>
@@ -493,32 +491,50 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
 
-  /* Glow button */
-  btnWrapper: { position: "relative", alignItems: "stretch" },
-  glowLayer: {
-    position: "absolute",
-    top: 6,
-    left: 10,
-    right: 10,
-    bottom: 6,
-    borderRadius: 16,
-    backgroundColor: "transparent",
+  /* ── CTA Button (matches Home page exactly) ── */
+  ctaWrap: {
+    borderRadius: 14,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#b8e890",
     shadowColor: "#6ec832",
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 0,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  btnOuter: { borderRadius: 16, overflow: "hidden" },
-  btnInner: {
-    paddingVertical: 17,
+  ctaBtn: {
+    paddingVertical: 11,
+    paddingHorizontal: 16,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
+    gap: 10,
   },
-  btnText: {
-    color: "#ffffff",
-    fontSize: 17,
+  ctaIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.7)",
+    borderWidth: 1,
+    borderColor: "#c0e898",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  ctaText: {
+    flex: 1,
+    fontSize: 13,
     fontWeight: "700",
-    letterSpacing: 0.3,
+    color: "#2a6008",
+    letterSpacing: 0.2,
+  },
+  ctaArrow: {
+    width: 26,
+    height: 26,
+    borderRadius: 8,
+    backgroundColor: "rgba(255,255,255,0.7)",
+    borderWidth: 1,
+    borderColor: "#c0e898",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

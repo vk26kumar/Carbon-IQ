@@ -63,7 +63,7 @@ function MetricCard({
       <View
         style={[
           styles.metricIconCircle,
-          { backgroundColor: accent + "18", borderColor: accent + "30" },
+          { backgroundColor: accent + "18", borderColor: accent + "40" },
         ]}
       >
         <Ionicons name={icon} size={22} color={accent} />
@@ -83,9 +83,9 @@ function Stars({ count }: { count: number }) {
         <Ionicons
           key={i}
           name={i < count ? "star" : "star-outline"}
-          size={24}
+          size={26}
           color={i < count ? "#f0b429" : "#cde8a8"}
-          style={{ marginHorizontal: 2 }}
+          style={{ marginHorizontal: 3 }}
         />
       ))}
     </View>
@@ -124,15 +124,12 @@ const ResultScreen = () => {
   const [starsCount, setStarsCount] = useState(0);
   const [ready, setReady] = useState(false);
 
-  // Header entrance
+  // Animations
   const headerFade = useRef(new Animated.Value(0)).current;
   const headerSlide = useRef(new Animated.Value(-20)).current;
-
-  // Score count-up animation
   const scoreAnim = useRef(new Animated.Value(0)).current;
-
-  // Always-glow next button
-  const glowAnim = useRef(new Animated.Value(0)).current;
+  const scaleBtn = useRef(new Animated.Value(0.94)).current;
+  const fadeBtn = useRef(new Animated.Value(0)).current;
 
   const formData =
     industry === "textile"
@@ -265,7 +262,6 @@ const ResultScreen = () => {
           }) as unknown as string[],
         );
       } else {
-        // manufacturing + all extended industries
         const units = toNum(units_produced);
         const elec = toNum(electricity_used);
         const water = toNum(water_used);
@@ -319,6 +315,7 @@ const ResultScreen = () => {
         "rating_excellent",
         "rating_outstanding",
       ][stars - 1];
+
       const finalScore = +total.toFixed(2);
       const finalNorm = +normalizedVal.toFixed(2);
       const ratingStr = `${i18n.t(ratingKey)} (${stars}/5)`;
@@ -343,35 +340,33 @@ const ResultScreen = () => {
         useNativeDriver: false,
       }).start();
 
-      // Header entrance
-      Animated.parallel([
-        Animated.timing(headerFade, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(headerSlide, {
-          toValue: 0,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-      ]).start();
-
-      // Glow loop
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(glowAnim, {
+      // Header entrance → then button entrance
+      Animated.sequence([
+        Animated.parallel([
+          Animated.timing(headerFade, {
             toValue: 1,
-            duration: 950,
-            useNativeDriver: false,
+            duration: 500,
+            useNativeDriver: true,
           }),
-          Animated.timing(glowAnim, {
+          Animated.timing(headerSlide, {
             toValue: 0,
-            duration: 950,
-            useNativeDriver: false,
+            duration: 500,
+            useNativeDriver: true,
           }),
         ]),
-      ).start();
+        Animated.parallel([
+          Animated.timing(fadeBtn, {
+            toValue: 1,
+            duration: 350,
+            useNativeDriver: true,
+          }),
+          Animated.timing(scaleBtn, {
+            toValue: 1,
+            duration: 350,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]).start();
 
       try {
         await addDoc(collection(db, "results"), {
@@ -399,15 +394,6 @@ const ResultScreen = () => {
   const statusBg = isOveruse ? "#fff0f0" : "#f0fce8";
   const statusBorder = isOveruse ? "#ffb0b0" : "#b8e890";
 
-  const glowSize = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [6, 22],
-  });
-  const glowOpacity = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.25, 0.58],
-  });
-
   return (
     <LinearGradient
       colors={["#f0fce8", "#e4f7d4", "#d8f2be"]}
@@ -433,9 +419,13 @@ const ResultScreen = () => {
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             >
-              <View style={styles.headerIconCircle}>
-                <Ionicons name="leaf-outline" size={26} color="#6ec832" />
-              </View>
+              <LinearGradient
+                colors={["#90d84a", "#54b820"]}
+                style={styles.headerIconCircle}
+              >
+                <Ionicons name="leaf-outline" size={26} color="#fff" />
+              </LinearGradient>
+
               <Text style={styles.heading}>
                 {i18n.t("carbon_footprint_results")}
               </Text>
@@ -497,16 +487,14 @@ const ResultScreen = () => {
 
           {/* ── RATING CARD ── */}
           {ready && (
-            <Animated.View>
-              <View style={styles.ratingCard}>
-                <View style={styles.sectionRow}>
-                  <View style={styles.accentBar} />
-                  <Text style={styles.sectionTitle}>{i18n.t("rating")}</Text>
-                </View>
-                <Stars count={starsCount} />
-                <Text style={styles.ratingText}>{rating}</Text>
+            <View style={styles.ratingCard}>
+              <View style={styles.sectionRow}>
+                <View style={styles.accentBar} />
+                <Text style={styles.sectionTitle}>{i18n.t("rating")}</Text>
               </View>
-            </Animated.View>
+              <Stars count={starsCount} />
+              <Text style={styles.ratingText}>{rating}</Text>
+            </View>
           )}
 
           {/* ── STATUS CARD ── */}
@@ -539,15 +527,15 @@ const ResultScreen = () => {
             </View>
           )}
 
-          {/* ── NEXT BUTTON — always glows ── */}
-          <View style={styles.btnWrapper}>
-            <Animated.View
-              style={[
-                styles.glowLayer,
-                { shadowRadius: glowSize, shadowOpacity: glowOpacity },
-              ]}
-            />
+          {/* ── CTA BUTTON (matches Home page style) ── */}
+          <Animated.View
+            style={{
+              opacity: fadeBtn,
+              transform: [{ scale: scaleBtn }],
+            }}
+          >
             <TouchableOpacity
+              activeOpacity={0.82}
               onPress={() =>
                 router.push({
                   pathname: "/emissionBreakdown",
@@ -566,22 +554,28 @@ const ResultScreen = () => {
                   },
                 })
               }
-              activeOpacity={0.87}
-              style={styles.btnOuter}
+              style={styles.ctaWrap}
             >
               <LinearGradient
-                colors={["#a8e858", "#6ec832", "#48a818"]}
-                style={styles.btnInner}
+                colors={["#edfadf", "#d4f5a8", "#c2ee8a"]}
+                style={styles.ctaBtn}
                 start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
+                end={{ x: 1, y: 1 }}
               >
-                <Text style={styles.btnText}>{i18n.t("next")}</Text>
-                <View style={styles.btnArrow}>
-                  <Ionicons name="arrow-forward" size={16} color="#fff" />
+                <View style={styles.ctaIconWrap}>
+                  <Ionicons
+                    name="analytics-outline"
+                    size={16}
+                    color="#3a7a10"
+                  />
+                </View>
+                <Text style={styles.ctaText}>{i18n.t("next")}</Text>
+                <View style={styles.ctaArrow}>
+                  <Ionicons name="arrow-forward" size={13} color="#3a7a10" />
                 </View>
               </LinearGradient>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>
@@ -609,15 +603,12 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   headerIconCircle: {
-    width: 52,
-    height: 52,
+    width: 54,
+    height: 54,
     borderRadius: 16,
-    backgroundColor: "#eaf8d8",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: "#c0e898",
+    marginBottom: 12,
   },
   heading: {
     fontSize: 20,
@@ -779,45 +770,49 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
-  /* Next button */
-  btnWrapper: {
-    position: "relative",
-    alignItems: "stretch",
-  },
-  glowLayer: {
-    position: "absolute",
-    top: 6,
-    left: 10,
-    right: 10,
-    bottom: 6,
-    borderRadius: 16,
-    backgroundColor: "transparent",
-    shadowColor: "#6ec832",
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 0,
-  },
-  btnOuter: {
-    borderRadius: 16,
+  /* ── CTA Button (matches Home page exactly) ── */
+  ctaWrap: {
+    borderRadius: 14,
     overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#b8e890",
+    shadowColor: "#6ec832",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  btnInner: {
-    paddingVertical: 17,
+  ctaBtn: {
+    paddingVertical: 11,
+    paddingHorizontal: 16,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
+    gap: 10,
   },
-  btnText: {
-    color: "#ffffff",
-    fontSize: 17,
-    fontWeight: "700",
-    letterSpacing: 0.3,
-  },
-  btnArrow: {
-    width: 30,
-    height: 30,
+  ctaIconWrap: {
+    width: 32,
+    height: 32,
     borderRadius: 10,
-    backgroundColor: "rgba(255,255,255,0.22)",
+    backgroundColor: "rgba(255,255,255,0.7)",
+    borderWidth: 1,
+    borderColor: "#c0e898",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  ctaText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#2a6008",
+    letterSpacing: 0.2,
+  },
+  ctaArrow: {
+    width: 26,
+    height: 26,
+    borderRadius: 8,
+    backgroundColor: "rgba(255,255,255,0.7)",
+    borderWidth: 1,
+    borderColor: "#c0e898",
     alignItems: "center",
     justifyContent: "center",
   },
