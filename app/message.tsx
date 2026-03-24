@@ -19,21 +19,17 @@ export default function MessageScreen() {
 
   if (lang) i18n.locale = lang.toString();
 
-  // ── Animations ──────────────────────────────────────────────────────────────
   const iconScale = useRef(new Animated.Value(0.5)).current;
   const iconOpacity = useRef(new Animated.Value(0)).current;
   const cardFade = useRef(new Animated.Value(0)).current;
   const cardSlide = useRef(new Animated.Value(28)).current;
   const btnFade = useRef(new Animated.Value(0)).current;
   const btnSlide = useRef(new Animated.Value(20)).current;
-  const glowAnim = useRef(new Animated.Value(0)).current;
 
-  // Pulse ring on icon
   const pulseScale = useRef(new Animated.Value(1)).current;
   const pulseOpacity = useRef(new Animated.Value(0.5)).current;
 
   useEffect(() => {
-    // Staggered entrance
     Animated.sequence([
       Animated.parallel([
         Animated.spring(iconScale, {
@@ -75,7 +71,6 @@ export default function MessageScreen() {
       ]),
     ]).start();
 
-    // Continuous pulse ring
     Animated.loop(
       Animated.sequence([
         Animated.parallel([
@@ -104,32 +99,7 @@ export default function MessageScreen() {
         ]),
       ]),
     ).start();
-
-    // Glow on button
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(glowAnim, {
-          toValue: 1,
-          duration: 950,
-          useNativeDriver: false,
-        }),
-        Animated.timing(glowAnim, {
-          toValue: 0,
-          duration: 950,
-          useNativeDriver: false,
-        }),
-      ]),
-    ).start();
   }, []);
-
-  const glowSize = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [6, 22],
-  });
-  const glowOpacity = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.25, 0.58],
-  });
 
   return (
     <LinearGradient
@@ -147,14 +117,12 @@ export default function MessageScreen() {
               { opacity: iconOpacity, transform: [{ scale: iconScale }] },
             ]}
           >
-            {/* Pulse ring */}
             <Animated.View
               style={[
                 styles.pulseRing,
                 { transform: [{ scale: pulseScale }], opacity: pulseOpacity },
               ]}
             />
-            {/* Icon circle */}
             <LinearGradient
               colors={["#90d84a", "#54b820"]}
               style={styles.iconCircle}
@@ -176,7 +144,6 @@ export default function MessageScreen() {
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             >
-              {/* Decorative dots */}
               <View style={styles.dotTR} />
               <View style={styles.dotBL} />
 
@@ -190,7 +157,6 @@ export default function MessageScreen() {
                 {i18n.t("simple_carbon_message")}
               </Text>
 
-              {/* Stat row */}
               <View style={styles.statRow}>
                 <View style={styles.statItem}>
                   <Ionicons name="leaf-outline" size={18} color="#6ec832" />
@@ -218,36 +184,33 @@ export default function MessageScreen() {
             </LinearGradient>
           </Animated.View>
 
-          {/* ── GO HOME BUTTON — always glows ── */}
+          {/* ── GO HOME BUTTON ── */}
           <Animated.View
             style={[
               styles.btnContainer,
               { opacity: btnFade, transform: [{ translateY: btnSlide }] },
             ]}
           >
-            <View style={styles.btnWrapper}>
-              <Animated.View
-                style={[
-                  styles.glowLayer,
-                  { shadowRadius: glowSize, shadowOpacity: glowOpacity },
-                ]}
-              />
-              <TouchableOpacity
-                onPress={() => router.push("/home")}
-                activeOpacity={0.87}
-                style={styles.btnOuter}
+            <TouchableOpacity
+              onPress={() => router.push("/home")}
+              activeOpacity={0.82}
+              style={styles.homeBtn}
+            >
+              <LinearGradient
+                colors={["#edfadf", "#d4f5a8", "#c2ee8a"]}
+                style={styles.homeBtnInner}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
               >
-                <LinearGradient
-                  colors={["#a8e858", "#6ec832", "#48a818"]}
-                  style={styles.btnInner}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                >
-                  <Ionicons name="home-outline" size={18} color="#fff" />
-                  <Text style={styles.btnText}>{i18n.t("go_home")}</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
+                <View style={styles.homeBtnIconWrap}>
+                  <Ionicons name="home-outline" size={16} color="#3a7a10" />
+                </View>
+                <Text style={styles.homeBtnText}>{i18n.t("go_home")}</Text>
+                <View style={styles.homeBtnArrow}>
+                  <Ionicons name="arrow-forward" size={13} color="#3a7a10" />
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
           </Animated.View>
         </View>
       </SafeAreaView>
@@ -373,41 +336,53 @@ const styles = StyleSheet.create({
     backgroundColor: "#c8eea0",
   },
 
-  /* Button */
+  /* Go Home button */
   btnContainer: {
     width: "100%",
   },
-  btnWrapper: {
-    position: "relative",
-    alignItems: "stretch",
-  },
-  glowLayer: {
-    position: "absolute",
-    top: 6,
-    left: 10,
-    right: 10,
-    bottom: 6,
-    borderRadius: 16,
-    backgroundColor: "transparent",
-    shadowColor: "#6ec832",
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 0,
-  },
-  btnOuter: {
-    borderRadius: 16,
+  homeBtn: {
+    borderRadius: 14,
     overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#b8e890",
+    shadowColor: "#6ec832",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  btnInner: {
-    paddingVertical: 17,
+  homeBtnInner: {
+    paddingVertical: 11,
+    paddingHorizontal: 16,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
+    gap: 10,
   },
-  btnText: {
-    color: "#ffffff",
-    fontSize: 17,
+  homeBtnIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.7)",
+    borderWidth: 1,
+    borderColor: "#c0e898",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  homeBtnText: {
+    flex: 1,
+    fontSize: 13,
     fontWeight: "700",
-    letterSpacing: 0.3,
+    color: "#2a6008",
+    letterSpacing: 0.2,
+  },
+  homeBtnArrow: {
+    width: 26,
+    height: 26,
+    borderRadius: 8,
+    backgroundColor: "rgba(255,255,255,0.7)",
+    borderWidth: 1,
+    borderColor: "#c0e898",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

@@ -1,4 +1,3 @@
-import { exportCSV } from "@/utils/exportToCSV";
 import i18n from "@/utils/i18n";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -31,12 +30,10 @@ const EmissionBreakdownScreen = () => {
     formData,
   } = useLocalSearchParams();
 
-  // ── Entrance animations ──
   const headerFade = useRef(new Animated.Value(0)).current;
   const headerSlide = useRef(new Animated.Value(-18)).current;
   const bodyFade = useRef(new Animated.Value(0)).current;
   const bodySlide = useRef(new Animated.Value(20)).current;
-  const glowAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (lang) i18n.locale = lang.toString();
@@ -68,24 +65,8 @@ const EmissionBreakdownScreen = () => {
         }),
       ]),
     ]).start();
-
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(glowAnim, {
-          toValue: 1,
-          duration: 950,
-          useNativeDriver: false,
-        }),
-        Animated.timing(glowAnim, {
-          toValue: 0,
-          duration: 950,
-          useNativeDriver: false,
-        }),
-      ]),
-    ).start();
   }, []);
 
-  // ── Parse params ──
   const parsedExceeded: string[] = Array.isArray(exceeded)
     ? exceeded.filter((e) => e.trim() !== "")
     : typeof exceeded === "string"
@@ -103,29 +84,6 @@ const EmissionBreakdownScreen = () => {
       : [];
 
   const parsedFormData = formData ? JSON.parse(formData.toString()) : {};
-
-  const handleCSVDownload = async () => {
-    await exportCSV({
-      vendorId: vendorId?.toString() ?? "",
-      industry: industry?.toString() ?? "",
-      formData: parsedFormData,
-      score: Number(score),
-      normalized: Number(normalized),
-      rating: rating?.toString() ?? "",
-      status: status?.toString() ?? "",
-      tips: parsedTips,
-      exceeded: parsedExceeded,
-    });
-  };
-
-  const glowSize = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [6, 22],
-  });
-  const glowOpacity = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.25, 0.58],
-  });
 
   const hasOveruse = parsedExceeded.length > 0;
 
@@ -168,7 +126,6 @@ const EmissionBreakdownScreen = () => {
                 <View style={{ width: 36 }} />
               </View>
 
-              {/* Score summary chips */}
               <View style={styles.chipRow}>
                 <View style={styles.chip}>
                   <Ionicons name="leaf-outline" size={13} color="#5a8040" />
@@ -275,7 +232,6 @@ const EmissionBreakdownScreen = () => {
                         <View style={styles.overuseDot} />
                         <Text style={styles.overuseLabel}>{label}</Text>
                       </View>
-                      {/* Mini bar showing used vs allowed */}
                       <View style={styles.overuseBarTrack}>
                         <View
                           style={[
@@ -344,26 +300,9 @@ const EmissionBreakdownScreen = () => {
               )}
             </View>
 
-            {/* ── ACTION BUTTONS ── */}
-            <View style={styles.actionRow}>
-              {/* CSV button */}
-              <TouchableOpacity
-                onPress={handleCSVDownload}
-                activeOpacity={0.82}
-                style={styles.csvWrap}
-              >
-                <LinearGradient
-                  colors={["#e8fad4", "#cdf0a0"]}
-                  style={styles.csvBtn}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                >
-                  <Ionicons name="download-outline" size={18} color="#3a7a10" />
-                  <Text style={styles.csvText}>{i18n.t("download_csv")}</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-
-              {/* Detail analysis button */}
+            {/* ── ACTION BUTTONS GRID ── */}
+            <View style={styles.actionGrid}>
+              {/* Detail Analysis */}
               <TouchableOpacity
                 onPress={() =>
                   router.push({
@@ -377,124 +316,127 @@ const EmissionBreakdownScreen = () => {
                   })
                 }
                 activeOpacity={0.82}
-                style={styles.csvWrap}
+                style={styles.gridBtn}
               >
                 <LinearGradient
-                  colors={["#e8fad4", "#cdf0a0"]}
-                  style={styles.csvBtn}
+                  colors={["#ffffff", "#edfadf"]}
+                  style={styles.gridBtnInner}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                 >
-                  <Ionicons
-                    name="bar-chart-outline"
-                    size={18}
-                    color="#3a7a10"
-                  />
-                  <Text style={styles.csvText}>
-                    {i18n.t("detailed_analysis")}
-                  </Text>
+                  <View style={styles.gridIconWrap}>
+                    <Ionicons
+                      name="bar-chart-outline"
+                      size={20}
+                      color="#3a7a10"
+                    />
+                  </View>
+                  <Text style={styles.gridBtnText}>Detail{"\n"}Analysis</Text>
                 </LinearGradient>
               </TouchableOpacity>
-            </View>
 
-            {/* ── CARBON OFFSET BUTTON ── */}
-            <TouchableOpacity
-              onPress={() =>
-                router.push({
-                  pathname: "/carbonOffset",
-                  params: {
-                    lang,
-                    vendorId,
-                    name,
-                    industry,
-                    score: score?.toString(),
-                    normalized: normalized?.toString(),
-                  },
-                })
-              }
-              activeOpacity={0.82}
-              style={styles.offsetWrap}
-            >
-              <LinearGradient
-                colors={["#e8fad4", "#cdf0a0"]}
-                style={styles.offsetBtn}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <Ionicons name="leaf-outline" size={18} color="#3a7a10" />
-                <Text style={styles.csvText}>Carbon Offset Suggestions</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-
-            {/* ── PDF REPORT BUTTON ── */}
-            <TouchableOpacity
-              onPress={() =>
-                router.push({
-                  pathname: "/pdfReport",
-                  params: {
-                    lang,
-                    vendorId,
-                    name,
-                    industry,
-                    score: score?.toString(),
-                    normalized: normalized?.toString(),
-                    rating: rating?.toString(),
-                    status: status?.toString(),
-                    tips: parsedTips.join("||"),
-                    exceeded: parsedExceeded.join("||"),
-                    formData: JSON.stringify(parsedFormData),
-                  },
-                })
-              }
-              activeOpacity={0.82}
-              style={styles.offsetWrap}
-            >
-              <LinearGradient
-                colors={["#e8fad4", "#cdf0a0"]}
-                style={styles.offsetBtn}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <Ionicons
-                  name="document-text-outline"
-                  size={18}
-                  color="#3a7a10"
-                />
-                <Text style={styles.csvText}>PDF Report</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-
-            {/* ── NEXT / MESSAGE BUTTON — always glows ── */}
-            <View style={styles.btnWrapper}>
-              <Animated.View
-                style={[
-                  styles.glowLayer,
-                  { shadowRadius: glowSize, shadowOpacity: glowOpacity },
-                ]}
-              />
+              {/* Carbon Offset */}
               <TouchableOpacity
                 onPress={() =>
                   router.push({
-                    pathname: "/message",
-                    params: { lang },
+                    pathname: "/carbonOffset",
+                    params: {
+                      lang,
+                      vendorId,
+                      name,
+                      industry,
+                      score: score?.toString(),
+                      normalized: normalized?.toString(),
+                    },
                   })
                 }
-                activeOpacity={0.87}
-                style={styles.btnOuter}
+                activeOpacity={0.82}
+                style={styles.gridBtn}
               >
                 <LinearGradient
-                  colors={["#a8e858", "#6ec832", "#48a818"]}
-                  style={styles.btnInner}
+                  colors={["#ffffff", "#edfadf"]}
+                  style={styles.gridBtnInner}
                   start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
+                  end={{ x: 1, y: 1 }}
                 >
-                  <Text style={styles.btnText}>{i18n.t("view_message")}</Text>
-                  <View style={styles.btnArrow}>
-                    <Ionicons name="arrow-forward" size={16} color="#fff" />
+                  <View style={styles.gridIconWrap}>
+                    <Ionicons name="leaf-outline" size={20} color="#3a7a10" />
                   </View>
+                  <Text style={styles.gridBtnText}>Carbon{"\n"}Offset</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+
+              {/* PDF Report */}
+              <TouchableOpacity
+                onPress={() =>
+                  router.push({
+                    pathname: "/pdfReport",
+                    params: {
+                      lang,
+                      vendorId,
+                      name,
+                      industry,
+                      score: score?.toString(),
+                      normalized: normalized?.toString(),
+                      rating: rating?.toString(),
+                      status: status?.toString(),
+                      tips: parsedTips.join("||"),
+                      exceeded: parsedExceeded.join("||"),
+                      formData: JSON.stringify(parsedFormData),
+                    },
+                  })
+                }
+                activeOpacity={0.82}
+                style={styles.gridBtn}
+              >
+                <LinearGradient
+                  colors={["#ffffff", "#edfadf"]}
+                  style={styles.gridBtnInner}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <View style={styles.gridIconWrap}>
+                    <Ionicons
+                      name="document-text-outline"
+                      size={20}
+                      color="#3a7a10"
+                    />
+                  </View>
+                  <Text style={styles.gridBtnText}>PDF{"\n"}Report</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </View>
+
+            {/* ── VIEW MESSAGE BUTTON ── */}
+            <TouchableOpacity
+              onPress={() =>
+                router.push({
+                  pathname: "/message",
+                  params: { lang },
+                })
+              }
+              activeOpacity={0.82}
+              style={styles.msgBtn}
+            >
+              <LinearGradient
+                colors={["#edfadf", "#d4f5a8", "#c2ee8a"]}
+                style={styles.msgBtnInner}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <View style={styles.msgIconWrap}>
+                  <Ionicons
+                    name="chatbubble-ellipses-outline"
+                    size={16}
+                    color="#3a7a10"
+                  />
+                </View>
+                <Text style={styles.msgBtnText}>{i18n.t("view_message")}</Text>
+                <View style={styles.msgArrow}>
+                  <Ionicons name="arrow-forward" size={13} color="#3a7a10" />
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
           </Animated.View>
         </ScrollView>
       </SafeAreaView>
@@ -683,84 +625,90 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
-  /* Action buttons row */
-  actionRow: {
+  /* Action grid */
+  actionGrid: {
     flexDirection: "row",
-    gap: 12,
+    gap: 10,
   },
-  csvWrap: {
+  gridBtn: {
     flex: 1,
-    borderRadius: 14,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#b8e890",
-  },
-  csvBtn: {
-    paddingVertical: 13,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-  },
-  csvText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#3a7a10",
-  },
-
-  offsetWrap: {
-    borderRadius: 14,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#b8e890",
-  },
-  offsetBtn: {
-    paddingVertical: 13,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-  },
-
-  /* Glow next button */
-  btnWrapper: {
-    position: "relative",
-    alignItems: "stretch",
-  },
-  glowLayer: {
-    position: "absolute",
-    top: 6,
-    left: 10,
-    right: 10,
-    bottom: 6,
     borderRadius: 16,
-    backgroundColor: "transparent",
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#c2e89a",
     shadowColor: "#6ec832",
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 0,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 2,
   },
-  btnOuter: {
-    borderRadius: 16,
-    overflow: "hidden",
+  gridBtnInner: {
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+    alignItems: "center",
+    gap: 8,
   },
-  btnInner: {
-    paddingVertical: 17,
-    flexDirection: "row",
+  gridIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: "#eaf8d8",
+    borderWidth: 1,
+    borderColor: "#c0e898",
     alignItems: "center",
     justifyContent: "center",
-    gap: 12,
   },
-  btnText: {
-    color: "#ffffff",
-    fontSize: 17,
-    fontWeight: "700",
-    letterSpacing: 0.3,
+  gridBtnText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: "#2e5a10",
+    textAlign: "center",
+    lineHeight: 15,
   },
-  btnArrow: {
-    width: 30,
-    height: 30,
+
+  /* Message button */
+  msgBtn: {
+    borderRadius: 14,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#b8e890",
+    shadowColor: "#6ec832",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  msgBtnInner: {
+    paddingVertical: 11,
+    paddingHorizontal: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  msgIconWrap: {
+    width: 32,
+    height: 32,
     borderRadius: 10,
-    backgroundColor: "rgba(255,255,255,0.22)",
+    backgroundColor: "rgba(255,255,255,0.7)",
+    borderWidth: 1,
+    borderColor: "#c0e898",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  msgBtnText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#2a6008",
+    letterSpacing: 0.2,
+  },
+  msgArrow: {
+    width: 26,
+    height: 26,
+    borderRadius: 8,
+    backgroundColor: "rgba(255,255,255,0.7)",
+    borderWidth: 1,
+    borderColor: "#c0e898",
     alignItems: "center",
     justifyContent: "center",
   },

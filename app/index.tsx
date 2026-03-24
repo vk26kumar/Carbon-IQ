@@ -27,7 +27,6 @@ const languages = [
 export default function LandingScreen() {
   const [language, setLanguage] = useState(i18n.locale || "en");
 
-  // ── Entrance animations ──
   const fadeTop = useRef(new Animated.Value(0)).current;
   const slideTop = useRef(new Animated.Value(-24)).current;
   const fadeImg = useRef(new Animated.Value(0)).current;
@@ -36,12 +35,10 @@ export default function LandingScreen() {
   const slideBtn = useRef(new Animated.Value(30)).current;
   const fadeBtn = useRef(new Animated.Value(0)).current;
 
-  // ── Pulse ring animation on logo ──
   const pulseScale = useRef(new Animated.Value(1)).current;
   const pulseOpacity = useRef(new Animated.Value(0.5)).current;
 
   useEffect(() => {
-    // Staggered entrance
     Animated.sequence([
       Animated.parallel([
         Animated.timing(fadeTop, {
@@ -88,7 +85,6 @@ export default function LandingScreen() {
       ]),
     ]).start();
 
-    // Continuous pulse on logo ring
     Animated.loop(
       Animated.sequence([
         Animated.parallel([
@@ -153,7 +149,6 @@ export default function LandingScreen() {
               { opacity: fadeTop, transform: [{ translateY: slideTop }] },
             ]}
           >
-            {/* Pulse ring behind logo */}
             <View style={styles.logoWrap}>
               <Animated.View
                 style={[
@@ -192,7 +187,6 @@ export default function LandingScreen() {
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             >
-              {/* Decorative corner accent */}
               <View style={styles.accentDotTL} />
               <View style={styles.accentDotBR} />
               <Image
@@ -250,15 +244,22 @@ export default function LandingScreen() {
           >
             <TouchableOpacity
               onPress={handleGetStarted}
-              activeOpacity={0.88}
+              activeOpacity={0.82}
               style={styles.ctaWrap}
             >
               <LinearGradient
-                colors={["#90d84a", "#6ec832", "#54b820"]}
+                colors={["#edfadf", "#d4f5a8", "#c2ee8a"]}
                 style={styles.ctaBtn}
                 start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
+                end={{ x: 1, y: 1 }}
               >
+                <View style={styles.ctaIconWrap}>
+                  <Image
+                    source={require("../assets/images/logo.png")}
+                    style={styles.ctaIconImg}
+                    resizeMode="contain"
+                  />
+                </View>
                 <Text style={styles.ctaText}>{i18n.t("next")}</Text>
                 <View style={styles.ctaArrow}>
                   <Text style={styles.ctaArrowText}>›</Text>
@@ -424,40 +425,58 @@ const styles = StyleSheet.create({
 
   /* ── CTA ── */
   ctaWrap: {
-    borderRadius: 16,
+    borderRadius: 14,
     overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#b8e890",
     shadowColor: "#6ec832",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 3,
   },
   ctaBtn: {
-    paddingVertical: 16,
-    paddingHorizontal: 28,
+    paddingVertical: 11,
+    paddingHorizontal: 16,
     flexDirection: "row",
     alignItems: "center",
+    gap: 10,
+  },
+  ctaIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.7)",
+    borderWidth: 1,
+    borderColor: "#c0e898",
+    alignItems: "center",
     justifyContent: "center",
-    gap: 12,
+  },
+  ctaIconImg: {
+    width: 20,
+    height: 20,
   },
   ctaText: {
-    color: "#ffffff",
-    fontSize: 16,
+    flex: 1,
+    fontSize: 13,
     fontWeight: "700",
-    letterSpacing: 0.4,
+    color: "#2a6008",
+    letterSpacing: 0.2,
   },
   ctaArrow: {
-    width: 28,
-    height: 28,
+    width: 26,
+    height: 26,
     borderRadius: 8,
-    backgroundColor: "rgba(255,255,255,0.25)",
+    backgroundColor: "rgba(255,255,255,0.7)",
+    borderWidth: 1,
+    borderColor: "#c0e898",
     alignItems: "center",
     justifyContent: "center",
   },
   ctaArrowText: {
-    color: "#ffffff",
-    fontSize: 20,
+    color: "#3a7a10",
+    fontSize: 18,
     fontWeight: "700",
-    lineHeight: 24,
+    lineHeight: 22,
   },
 });
