@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Delete Account – Carbon IQ</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: linear-gradient(135deg, #f0fce8, #e4f7d4, #d8f2be);
+        min-height: 100vh;
+        padding: 24px 16px 48px;
+        color: #1a4008;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #ffffff, #fff0f0, #ffe0e0);
+        border: 1px solid #ffcccc;
+        border-radius: 20px;
+        padding: 32px 28px;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .icon-wrap {
+        width: 72px;
+        height: 72px;
+        background: linear-gradient(135deg, #ffcccc, #ff9999);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+        font-size: 32px;
+      }
+
+      .header h1 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #c0392b;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        font-size: 14px;
+        color: #7a4040;
+        line-height: 1.6;
+      }
+
+      .section {
+        background: rgba(255, 255, 255, 0.88);
+        border: 1px solid #caeaa8;
+        border-radius: 18px;
+        padding: 22px;
+        margin-bottom: 14px;
+      }
+
+      .section.danger {
+        border-color: #ffcccc;
+      }
+
+      .section h2 {
+        font-size: 15px;
+        font-weight: 700;
+        color: #1a4008;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .section h2.red {
+        color: #c0392b;
+      }
+
+      .step {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 12px 0;
+        border-bottom: 1px solid #ddf0c8;
+      }
+
+      .step:last-child {
+        border-bottom: none;
+      }
+
+      .step-num {
+        width: 30px;
+        height: 30px;
+        background: linear-gradient(135deg, #90d84a, #6ec832);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 13px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+
+      .step-text {
+        font-size: 14px;
+        color: #3a5a20;
+        line-height: 1.6;
+        padding-top: 4px;
+      }
+
+      .step-text strong {
+        color: #1a4008;
+      }
+
+      .delete-list li {
+        font-size: 14px;
+        color: #7a3030;
+        line-height: 1.7;
+        padding: 6px 0;
+        border-bottom: 1px solid #ffcccc;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        list-style: none;
+      }
+
+      .delete-list li:last-child {
+        border-bottom: none;
+      }
+
+      .delete-list li::before {
+        content: "✗";
+        color: #c0392b;
+        font-weight: 700;
+        font-size: 16px;
+      }
+
+      .note {
+        background: #fff8f8;
+        border: 1px solid #ffd0d0;
+        border-radius: 14px;
+        padding: 16px 18px;
+        margin-bottom: 14px;
+      }
+
+      .note p {
+        font-size: 13px;
+        color: #7a4040;
+        line-height: 1.6;
+      }
+
+      .note strong {
+        color: #c0392b;
+      }
+
+      .contact-card {
+        background: rgba(255, 255, 255, 0.88);
+        border: 1px solid #caeaa8;
+        border-radius: 14px;
+        padding: 18px;
+        text-align: center;
+        margin-bottom: 14px;
+      }
+
+      .contact-card p {
+        font-size: 14px;
+        color: #4a6a30;
+        line-height: 1.6;
+      }
+
+      .contact-card a {
+        color: #38aae0;
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      .footer-note {
+        text-align: center;
+        font-size: 12px;
+        color: #8aba70;
+        margin-top: 8px;
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #4a9a20;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        margin-bottom: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a class="back-link" href="privacy-policy.html">← Privacy Policy</a>
+
+      <!-- Header -->
+      <div class="header">
+        <div class="icon-wrap">🗑️</div>
+        <h1>Delete Your Account</h1>
+        <p>
+          You can permanently delete your Carbon IQ account and all associated
+          data at any time. This action is <strong>irreversible</strong>.
+        </p>
+      </div>
+
+      <!-- What gets deleted -->
+      <div class="section danger">
+        <h2 class="red">⚠️ What Will Be Deleted</h2>
+        <ul class="delete-list">
+          <li>Your vendor profile and registration details</li>
+          <li>All carbon emission records and scores</li>
+          <li>All form submissions and input data</li>
+          <li>All generated reports and history</li>
+        </ul>
+      </div>
+
+      <!-- How to delete inside app -->
+      <div class="section">
+        <h2>📱 How to Delete From the App</h2>
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-text">
+            Open the <strong>Carbon IQ</strong> app on your device
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-text">
+            On the <strong>Home screen</strong>, scroll down to the Account
+            section at the bottom
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-text">Tap <strong>Delete Account</strong></div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-text">
+            Enter your <strong>Vendor ID</strong> and type
+            <strong>DELETE</strong> to confirm
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-text">
+            Tap <strong>Delete My Account Permanently</strong> — all your data
+            will be immediately removed
+          </div>
+        </div>
+      </div>
+
+      <!-- Warning note -->
+      <div class="note">
+        <p>
+          ⚠️ <strong>This cannot be undone.</strong> Once deleted, your Vendor
+          ID, emission history, and all reports are permanently erased from our
+          servers and cannot be recovered.
+        </p>
+      </div>
+
+      <!-- Request by email -->
+      <div class="contact-card">
+        <p>
+          Don't have access to the app? You can also request account deletion by
+          emailing us at:<br /><br />
+          <a href="mailto:carboniq.support@gmail.com"
+            >carboniq.support@gmail.com</a
+          ><br /><br />
+          Include your <strong>Vendor ID</strong> in the email. We will process
+          your request within <strong>7 business days</strong>.
+        </p>
+      </div>
+
+      <p class="footer-note">© 2025 Carbon IQ. All rights reserved.</p>
+    </div>
+  </body>
+</html>

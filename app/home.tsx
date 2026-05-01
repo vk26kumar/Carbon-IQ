@@ -89,6 +89,7 @@ export default function Home() {
   const fadeCards = useRef(new Animated.Value(0)).current;
   const scaleBtn = useRef(new Animated.Value(0.94)).current;
   const fadeBtn = useRef(new Animated.Value(0)).current;
+  const fadeFooter = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.sequence([
@@ -121,6 +122,11 @@ export default function Home() {
           useNativeDriver: true,
         }),
       ]),
+      Animated.timing(fadeFooter, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
     ]).start();
   }, []);
 
@@ -239,6 +245,52 @@ export default function Home() {
               </LinearGradient>
             </TouchableOpacity>
           </Animated.View>
+
+          {/* ── SETTINGS FOOTER ── */}
+          <Animated.View style={{ opacity: fadeFooter, gap: 10 }}>
+            {/* Divider */}
+            <View style={styles.footerDividerRow}>
+              <View style={styles.footerDividerLine} />
+              <Text style={styles.footerDividerText}>Account</Text>
+              <View style={styles.footerDividerLine} />
+            </View>
+
+            {/* Privacy Policy */}
+            <TouchableOpacity
+              onPress={() =>
+                router.push({ pathname: "/privacyPolicy", params: { lang } })
+              }
+              activeOpacity={0.82}
+              style={styles.footerRow}
+            >
+              <View style={styles.footerIconWrap}>
+                <Ionicons
+                  name="shield-checkmark-outline"
+                  size={16}
+                  color="#4a9a20"
+                />
+              </View>
+              <Text style={styles.footerRowText}>Privacy Policy</Text>
+              <Ionicons name="chevron-forward" size={14} color="#a0c880" />
+            </TouchableOpacity>
+
+            {/* Delete Account */}
+            <TouchableOpacity
+              onPress={() =>
+                router.push({ pathname: "/deleteAccount", params: { lang } })
+              }
+              activeOpacity={0.82}
+              style={[styles.footerRow, styles.footerRowDanger]}
+            >
+              <View style={[styles.footerIconWrap, styles.footerIconDanger]}>
+                <Ionicons name="trash-outline" size={16} color="#c0392b" />
+              </View>
+              <Text style={[styles.footerRowText, styles.footerRowTextDanger]}>
+                Delete Account
+              </Text>
+              <Ionicons name="chevron-forward" size={14} color="#e08080" />
+            </TouchableOpacity>
+          </Animated.View>
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>
@@ -246,12 +298,8 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  gradientBg: {
-    flex: 1,
-  },
-  safe: {
-    flex: 1,
-  },
+  gradientBg: { flex: 1 },
+  safe: { flex: 1 },
   scroll: {
     flexGrow: 1,
     paddingHorizontal: 20,
@@ -314,10 +362,7 @@ const styles = StyleSheet.create({
   },
 
   /* ── Feature cards ── */
-  featureRow: {
-    flexDirection: "row",
-    gap: 10,
-  },
+  featureRow: { flexDirection: "row", gap: 10 },
   featureCard: {
     flex: 1,
     borderRadius: 16,
@@ -326,9 +371,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     gap: 8,
   },
-  featureIcon: {
-    fontSize: 24,
-  },
+  featureIcon: { fontSize: 24 },
   featureText: {
     fontSize: 11,
     fontWeight: "600",
@@ -444,5 +487,63 @@ const styles = StyleSheet.create({
     borderColor: "#c0e898",
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  /* ── Settings Footer ── */
+  footerDividerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  footerDividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#caeaa8",
+    borderRadius: 1,
+  },
+  footerDividerText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: "#8aba70",
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
+  },
+  footerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    backgroundColor: "rgba(255,255,255,0.85)",
+    borderRadius: 14,
+    paddingVertical: 13,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: "#caeaa8",
+  },
+  footerRowDanger: {
+    backgroundColor: "#fff8f8",
+    borderColor: "#ffd0d0",
+  },
+  footerIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 9,
+    backgroundColor: "#eaf8d8",
+    borderWidth: 1,
+    borderColor: "#c0e898",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  footerIconDanger: {
+    backgroundColor: "#fff0f0",
+    borderColor: "#ffcccc",
+  },
+  footerRowText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#3a6a20",
+  },
+  footerRowTextDanger: {
+    color: "#c0392b",
   },
 });

@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import "dotenv/config";
 
 export default {
   expo: {
@@ -12,7 +12,7 @@ export default {
     splash: {
       image: "./assets/images/splash-icon.png",
       resizeMode: "contain",
-      backgroundColor: "#ffffff",
+      backgroundColor: "#f0fce8",
     },
     updates: {
       fallbackToCacheTimeout: 0,
@@ -20,13 +20,20 @@ export default {
     assetBundlePatterns: ["**/*"],
     ios: {
       supportsTablet: true,
-      bundleIdentifier: "com.CarbonIQ.appname",
+      bundleIdentifier: "com.carboniq.app",
     },
     android: {
-      package: "com.CarbonIQ.appname", 
+      package: "com.carboniq.app",
+      versionCode: 1,
+      targetSdkVersion: 35,
+      minSdkVersion: 24,
+      permissions: [
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE",
+      ],
       adaptiveIcon: {
         foregroundImage: "./assets/images/adaptive-icon.png",
-        backgroundColor: "#ffffff",
+        backgroundColor: "#E8F5E9",
       },
     },
     web: {
@@ -37,7 +44,8 @@ export default {
       FIREBASE_AUTH_DOMAIN: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
       FIREBASE_PROJECT_ID: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
       FIREBASE_STORAGE_BUCKET: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
-      FIREBASE_MESSAGING_SENDER_ID: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+      FIREBASE_MESSAGING_SENDER_ID:
+        process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
       FIREBASE_APP_ID: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
       FIREBASE_MEASUREMENT_ID: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
       eas: {

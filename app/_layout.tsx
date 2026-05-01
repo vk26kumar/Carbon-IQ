@@ -22,6 +22,8 @@ export default function RootLayout() {
         <Stack.Screen name="message" />
         <Stack.Screen name="carbonOffset" />
         <Stack.Screen name="pdfReport" />
+        <Stack.Screen name="deleteAccount" />
+        <Stack.Screen name="privacyPolicy" />
       </Stack>
     </GestureHandlerRootView>
   );
