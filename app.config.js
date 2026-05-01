@@ -20,10 +20,10 @@ export default {
     assetBundlePatterns: ["**/*"],
     ios: {
       supportsTablet: true,
-      bundleIdentifier: "com.carboniq.app",
+      bundleIdentifier: "com.carboniq.mobile",
     },
     android: {
-      package: "com.carboniq.app",
+      package: "com.carboniq.mobile",
       versionCode: 1,
       targetSdkVersion: 35,
       minSdkVersion: 24,
@@ -35,6 +35,8 @@ export default {
         foregroundImage: "./assets/images/adaptive-icon.png",
         backgroundColor: "#E8F5E9",
       },
+      intentFilters: [],
+      blockedPermissions: [],
     },
     web: {
       favicon: "./assets/images/favicon.png",
