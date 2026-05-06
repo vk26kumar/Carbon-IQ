@@ -290,6 +290,31 @@ export default function Home() {
               </Text>
               <Ionicons name="chevron-forward" size={14} color="#e08080" />
             </TouchableOpacity>
+
+            {/* ── DISCLAIMER FOOTER ── */}
+            <View style={styles.disclaimerCard}>
+              <View style={styles.disclaimerTitleRow}>
+                <Ionicons
+                  name="information-circle-outline"
+                  size={15}
+                  color="#7aaa50"
+                />
+                <Text style={styles.disclaimerTitle}>Disclaimer</Text>
+              </View>
+              <Text style={styles.disclaimerText}>
+                Carbon IQ is an independent, privately developed application and
+                is{" "}
+                <Text style={styles.disclaimerBold}>
+                  NOT affiliated with, endorsed by or representing any
+                  government entity or regulatory body.
+                </Text>{" "}
+                Emission benchmarks used in this app are based on publicly
+                available industry research and are for informational purposes
+                only.Dont't rely solely on this app for critical decisions.
+                Always consult official guidelines and experts when assessing
+                your carbon footprint.
+              </Text>
+            </View>
           </Animated.View>
         </ScrollView>
       </SafeAreaView>
@@ -545,5 +570,35 @@ const styles = StyleSheet.create({
   },
   footerRowTextDanger: {
     color: "#c0392b",
+  },
+  /* ── Disclaimer ── */
+  disclaimerCard: {
+    backgroundColor: "rgba(255,255,255,0.75)",
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#caeaa8",
+    gap: 8,
+  },
+  disclaimerTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  disclaimerTitle: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#5a8a40",
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+  },
+  disclaimerText: {
+    fontSize: 11,
+    color: "#6a8a60",
+    lineHeight: 17,
+  },
+  disclaimerBold: {
+    fontWeight: "700",
+    color: "#3a6a20",
   },
 });

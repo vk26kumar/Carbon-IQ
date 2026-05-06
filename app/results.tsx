@@ -477,7 +477,7 @@ const ResultScreen = () => {
             />
             <MetricCard
               icon="shield-checkmark-outline"
-              title={i18n.t("govt_standard_normalized_score")}
+              title={i18n.t("industry_benchmark_score")}
               value={standardNormalized.toFixed(1)}
               sub={i18n.t("co2_per_unit")}
               delay={300}

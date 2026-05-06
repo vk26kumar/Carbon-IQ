@@ -47,7 +47,7 @@ i18n.translations = {
     normalized_emission_score: "Normalized Emission Score",
     rating: "Rating",
     status: "Status",
-    govt_standard_normalized_score: "Government Standard Normalized Score",
+    industry_benchmark_score: "Industry Benchmark Score",
     suggestions: "Suggestions",
     download_csv: "Download CSV",
 
@@ -175,7 +175,7 @@ i18n.translations = {
     normalized_emission_score: "सामान्यीकृत उत्सर्जन स्कोर",
     rating: "रेटिंग",
     status: "स्थिति",
-    govt_standard_normalized_score: "मानक सामान्यीकृत स्कोर",
+    industry_benchmark_score: "उद्योग बेंचमार्क स्कोर",
     suggestions: "सुझाव",
     download_csv: "CSV डाउनलोड करें",
 
@@ -299,7 +299,7 @@ i18n.translations = {
     normalized_emission_score: "Puntuación de emisiones normalizada",
     rating: "Calificación",
     status: "Estado",
-    govt_standard_normalized_score: "Estándar normalizado del gobierno",
+    industry_benchmark_score: "Puntuación de Referencia Industrial",
     suggestions: "Sugerencias",
     download_csv: "Descargar CSV",
 
@@ -418,7 +418,7 @@ i18n.translations = {
     normalized_emission_score: "Score d'émissions normalisé",
     rating: "Évaluation",
     status: "Statut",
-    govt_standard_normalized_score: "Score standard du gouvernement",
+    industry_benchmark_score: "Score de Référence Industriel",
     suggestions: "Suggestions",
     download_csv: "Télécharger le CSV",
 
@@ -539,7 +539,7 @@ i18n.translations = {
     normalized_emission_score: "标准化排放评分",
     rating: "评分",
     status: "状态",
-    govt_standard_normalized_score: "政府标准化评分",
+    industry_benchmark_score: "行业基准分数",
     suggestions: "建议",
     download_csv: "下载 CSV",
 
@@ -656,7 +656,7 @@ i18n.translations = {
     normalized_emission_score: "درجة الانبعاثات المعيارية",
     rating: "التقييم",
     status: "الحالة",
-    govt_standard_normalized_score: "الدرجة المعيارية الحكومية",
+    industry_benchmark_score: "نقاط المعيار الصناعي",
     suggestions: "الاقتراحات",
     download_csv: "تنزيل CSV",
 
