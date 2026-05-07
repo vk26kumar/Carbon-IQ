@@ -24,7 +24,7 @@ export default {
     },
     android: {
       package: "com.carboniq.mobile",
-      versionCode: 1,
+      versionCode: 1.1,
       targetSdkVersion: 35,
       minSdkVersion: 24,
       permissions: [
