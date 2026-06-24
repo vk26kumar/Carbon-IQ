@@ -5,7 +5,7 @@ export default {
     name: "CARBON-IQ",
     slug: "carbon-iq",
     owner: "vk26_vishal",
-    version: "1.0.0",
+    version: "1.0.1",
     orientation: "portrait",
     scheme: "CARBON-IQ",
     icon: "./assets/images/icon.png",
@@ -24,7 +24,7 @@ export default {
     },
     android: {
       package: "com.carboniq.mobile",
-      versionCode: 2,
+      versionCode: 3,
       targetSdkVersion: 35,
       minSdkVersion: 24,
       permissions: [
